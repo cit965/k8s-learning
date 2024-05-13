@@ -16,7 +16,7 @@
 ## 目前课程
 
 - k8s 1000 个面试题
-  - ./k8s-1000-question.md
+  - [链接](./k8s-1000-question.md)
 - k8s 训练营入门：
   - https://space.bilibili.com/28187952/channel/collectiondetail?sid=2269587
 - k8s cka
