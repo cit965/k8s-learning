@@ -5,3 +5,4 @@
 - 03 删除一个namespace经历了哪些流程，越详细越好
 - 04 客户端 每次 watch资源都会通过apiserver 与etcd建立一个watch链接吗？如果不是，请说说问题和解决方案。
 - 05 kubelet evictPod 会排除哪种类型的？
+- 06 你能说说kubectl apply 一个文件发生的完整过程吗？越详细越好
