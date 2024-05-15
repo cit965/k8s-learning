@@ -35,3 +35,16 @@
 
 可以加v: nangework 
 
+## k8s 大佬 twitter
+
+https://twitter.com/thockin
+https://twitter.com/smarterclayton
+https://twitter.com/originalavalamp
+https://twitter.com/bgrant0607
+https://twitter.com/vishnukanan
+https://twitter.com/the_saad_ali
+https://twitter.com/kelseyhightower
+https://twitter.com/jbeda
+https://twitter.com/brendandburns
+https://twitter.com/michellenoorali
+https://twitter.com/kubeweekly
