@@ -9,3 +9,8 @@
 - 07 kubernetes中pod spec设置的limits request会转换为哪些参数进行限制
 - 08 metrics-server的采集周期，采集链路是什么样的
 - 09 kubernetes proxy中 发现长时间运行的tcp连接 如何处理invalid包 如果更优雅的解决需要修改哪个参数
+- 10 deployment rollback的原理是什么，你能给我说说背后发生了哪些事，涉及到的deploy spec上的哪些字段？
+- 11 kubelet 中pleg 是用来解决什么问题？
+- 12 pod gc 你了解吗，给我说说什么情况下pod 会被gc
+- 13 pod 不允许改哪些字段？
+- 14 limitrange 对于pod 的 update 事件会不会处理？
