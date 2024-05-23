@@ -14,3 +14,7 @@
 - 12 pod gc 你了解吗，给我说说什么情况下pod 会被gc
 - 13 pod 不允许改哪些字段？
 - 14 limitrange 对于pod 的 update 事件会不会处理？
+- 15 请说说 cri，containerd，runc之间的关系？执行 docker run xxx 命令底层经过哪些步骤，越详细越好。
+- 16 k8s内部版本和外部版本有什么区别，etcd存的什么版本？
+- 17 client 有哪几种客户端？
+- 18 kubernetes shared Informer 机制
