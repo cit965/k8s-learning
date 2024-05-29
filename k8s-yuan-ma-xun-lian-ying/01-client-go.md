@@ -84,7 +84,9 @@ go build -o app .
 ./app -kubeconfig=/path/to/xxx
 ```
 
-### 3. 对于deployment资源CRUD
+### 3. deployment资源CRUD - typed 方式
+
+以下代码创建一个有2个副本数的deployment，然后更新副本数为1，升级nginx镜像版本，最后删除
 
 ```go
 	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
@@ -203,5 +205,68 @@ func prompt() {
 }
 
 func int32Ptr(i int32) *int32 { return &i }
+
+```
+
+### 4.deployment资源CRUD - dynamic方式
+
+使用typed方式创建资源虽然方便，但是需要事先使用client-gen生成且会与某个特定版本耦合，不够通用，所以我们可以使用 unstructured.Unstructured 来表示集群中任意对象。
+
+```go
+	client, err := dynamic.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
+	
+	deploymentRes := schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
+
+	deployment := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": "apps/v1",
+			"kind":       "Deployment",
+			"metadata": map[string]interface{}{
+				"name": "demo-deployment",
+			},
+			"spec": map[string]interface{}{
+				"replicas": 2,
+				"selector": map[string]interface{}{
+					"matchLabels": map[string]interface{}{
+						"app": "demo",
+					},
+				},
+				"template": map[string]interface{}{
+					"metadata": map[string]interface{}{
+						"labels": map[string]interface{}{
+							"app": "demo",
+						},
+					},
+
+					"spec": map[string]interface{}{
+						"containers": []map[string]interface{}{
+							{
+								"name":  "web",
+								"image": "nginx:1.12",
+								"ports": []map[string]interface{}{
+									{
+										"name":          "http",
+										"protocol":      "TCP",
+										"containerPort": 80,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Create Deployment
+	fmt.Println("Creating deployment...")
+	result, err := client.Resource(deploymentRes).Namespace(apiv1.NamespaceDefault).Create(context.TODO(), deployment, metav1.CreateOptions{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Created deployment %q.\n", result.GetName())
 
 ```
