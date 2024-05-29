@@ -372,3 +372,11 @@ serviceaccounts
 		Into(result)
 
 ```
+
+## 4、局限
+
+使用 client 操作集群中资源会导致频繁的轮询，k8s client-go 包提供了更加高效的方式：informer 。
+
+informer 提供了一种机制来监视 Kubernetes 集群内资源的变化并做出反应。它使开发人员能够接收有关各种 Kubernetes 对象（例如 Pod、服务、部署等）状态的实时更新。
+
+Informer 将集群中的资源缓存在本地来减少频繁的API调用，提高性能并优化资源利用率。
