@@ -84,7 +84,7 @@ go build -o app .
 ./app -kubeconfig=/path/to/xxx
 ```
 
-### 3. deployment资源CRUD - typed 方式
+### 3. deployment资源CRUD - typed (clientset)方式
 
 以下代码创建一个有2个副本数的deployment，然后更新副本数为1，升级nginx镜像版本，最后删除
 
@@ -318,9 +318,11 @@ func main() {
 }
 
 // 输出支持的组列表
-//(v1.APIGroup) &APIGroup{Name:apps,Versions:[]GroupVersionForDiscovery{GroupVersionForDiscovery{GroupVersion:apps/v1,Version:v1,},},PreferredVersion:GroupVersionForDiscovery{GroupVersion:apps/v1,Version:v1,},ServerAddressByClientCIDRs:[]ServerAddressByClientCIDR{},},
-//(v1.APIGroup) &APIGroup{Name:events.k8s.io,Versions:[]GroupVersionForDiscovery{GroupVersionForDiscovery{GroupVersion:events.k8s.io/v1,Version:v1,},},PreferredVersion:GroupVersionForDiscovery{GroupVersion:events.k8s.io/v1,Version:v1,},ServerAddressByClientCIDRs:[]ServerAddressByClientCIDR{},},
-// ...
+/*
+(v1.APIGroup) &APIGroup{Name:apps,Versions:[]GroupVersionForDiscovery{GroupVersionForDiscovery{GroupVersion:apps/v1,Version:v1,},},PreferredVersion:GroupVersionForDiscovery{GroupVersion:apps/v1,Version:v1,},ServerAddressByClientCIDRs:[]ServerAddressByClientCIDR{},},
+(v1.APIGroup) &APIGroup{Name:events.k8s.io,Versions:[]GroupVersionForDiscovery{GroupVersionForDiscovery{GroupVersion:events.k8s.io/v1,Version:v1,},},PreferredVersion:GroupVersionForDiscovery{GroupVersion:events.k8s.io/v1,Version:v1,},ServerAddressByClientCIDRs:[]ServerAddressByClientCIDR{},},
+...
+*/
 
 // 输出core/v1组下的资源列表
 /*
@@ -335,5 +337,38 @@ secrets
 serviceaccounts
 ...
 */
+
+```
+
+### 6. restClient
+
+上面三种客户端都是基于 restClient 封装的，restClient 是 client-go 最基础的客户端，对http request 进行了封装，更加灵活，一般我们用不到。
+
+```go
+// 根据配置信息构建restClient实例
+	restClient, err := rest.RESTClientFor(config)
+
+	if err!=nil {
+		panic(err.Error())
+	}
+
+	// 保存pod结果的数据结构实例
+	result := &corev1.PodList{}
+
+	//  指定namespace
+	namespace := "kube-system"
+	// 设置请求参数，然后发起请求
+	// GET请求
+	err = restClient.Get().
+		//  指定namespace，参考path : /api/v1/namespaces/{namespace}/pods
+		Namespace(namespace).
+		// 查找多个pod，参考path : /api/v1/namespaces/{namespace}/pods
+		Resource("pods").
+		// 指定大小限制和序列化工具
+		VersionedParams(&metav1.ListOptions{Limit:100}, scheme.ParameterCodec).
+		// 请求
+		Do(context.TODO()).
+		// 结果存入result
+		Into(result)
 
 ```
