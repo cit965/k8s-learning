@@ -5,4 +5,5 @@
 
 ## k8s源码训练营
 
+* [Informer](k8s-yuan-ma-xun-lian-ying/informer.md)
 * [client-go](k8s-yuan-ma-xun-lian-ying/client-go.md)
