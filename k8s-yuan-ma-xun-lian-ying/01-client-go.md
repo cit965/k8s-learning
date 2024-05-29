@@ -270,3 +270,70 @@ func int32Ptr(i int32) *int32 { return &i }
 	fmt.Printf("Created deployment %q.\n", result.GetName())
 
 ```
+
+### 5. discoveryClient
+
+3-4小节我们学习了 typed client 和 dynamic client ，这两个client使用来操作集群中资源，比如创建 deployment，删除pod。discovery client 不同，他是用来发现服务端支持的组、版本、资源类型：
+
+```
+// Package discovery provides ways to discover server-supported
+// API groups, versions and resources.
+```
+
+我们可以查询服务端支持的组与版本、某个组的资源列表
+
+```go
+func main() {
+	var kubeconfig *string
+	if home := homedir.HomeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+
+	// use the current context in kubeconfig
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// *查询服务端支持的组列表
+	discoveryClient := discovery.NewDiscoveryClientForConfigOrDie(config)
+	gs, err := discoveryClient.ServerGroups()
+	if err != nil {
+		panic(err.Error())
+	}
+	spew.Dump(gs.Groups)
+	
+	// *查询core/v1 组下的资源列表
+	rs, err := discoveryClient.ServerResourcesForGroupVersion("v1")
+	if err != nil {
+		panic(err.Error())
+	}
+	for _, r := range rs.APIResources {
+		fmt.Println(r.Name)
+	}
+
+}
+
+// 输出支持的组列表
+//(v1.APIGroup) &APIGroup{Name:apps,Versions:[]GroupVersionForDiscovery{GroupVersionForDiscovery{GroupVersion:apps/v1,Version:v1,},},PreferredVersion:GroupVersionForDiscovery{GroupVersion:apps/v1,Version:v1,},ServerAddressByClientCIDRs:[]ServerAddressByClientCIDR{},},
+//(v1.APIGroup) &APIGroup{Name:events.k8s.io,Versions:[]GroupVersionForDiscovery{GroupVersionForDiscovery{GroupVersion:events.k8s.io/v1,Version:v1,},},PreferredVersion:GroupVersionForDiscovery{GroupVersion:events.k8s.io/v1,Version:v1,},ServerAddressByClientCIDRs:[]ServerAddressByClientCIDR{},},
+// ...
+
+// 输出core/v1组下的资源列表
+/*
+pods/status
+podtemplates
+replicationcontrollers
+replicationcontrollers/scale
+replicationcontrollers/status
+resourcequotas
+resourcequotas/status
+secrets
+serviceaccounts
+...
+*/
+
+```
