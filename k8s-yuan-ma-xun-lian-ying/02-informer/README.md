@@ -1,10 +1,10 @@
-# Informer
+# 02-Informer
 
 ### 背景
 
 Informer 机制是 Kubernetes 客户端库 client-go 中的一个核心功能，用于高效地同步和监控集群中资源，例如 Pod、Service、Deployment 等，其整体流程如下：
 
-<figure><img src="../.gitbook/assets/client-go-informer.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/client-go-informer.png" alt=""><figcaption></figcaption></figure>
 
 从图上我们可以看到 Informer 包含2个蓝色组件，分别是Reflector，Indexer。
 
