@@ -1,6 +1,6 @@
 # Informer
 
-### 背景知识
+### 背景
 
 Informer 机制是 Kubernetes 客户端库 client-go 中的一个核心功能，用于高效地同步和监控集群中资源，例如 Pod、Service、Deployment 等，其整体流程如下：
 
@@ -252,9 +252,7 @@ deploymentLister := kubeInformerFactory.Core().V1().Pods().Lister()
 kubeInformerFactory.Start(stopCh)
 ```
 
-###
-
-## 第二节
+### 启动源码
 
 ```go
 kubeInformerFactory := kubeinformers.NewSharedInformerFactory(kubeClient, time.Second*30)
@@ -263,8 +261,6 @@ kubeInformerFactory.Start(stopCh)
 ```
 
 上节课我们讲了如何使用 SharedInformerFactory 创建一个 deployment informer，这节课我们深入到 informer 的启动源码。
-
-### 启动源码
 
 ```go
 func (f *sharedInformerFactory) Start(stopCh <-chan struct{}) {
