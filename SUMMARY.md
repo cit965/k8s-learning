@@ -6,5 +6,5 @@
 ## k8s源码训练营
 
 * [01-client-go](k8s-yuan-ma-xun-lian-ying/01-client-go.md)
-* [02-Informer](k8s-yuan-ma-xun-lian-ying/02-informer/README.md)
-  * [03-写一个控制器](k8s-yuan-ma-xun-lian-ying/02-informer/03-xie-yi-ge-kong-zhi-qi.md)
+* [02-Informer](k8s-yuan-ma-xun-lian-ying/02-informer.md)
+* [03-写一个控制器](k8s-yuan-ma-xun-lian-ying/03-xie-yi-ge-kong-zhi-qi.md)
