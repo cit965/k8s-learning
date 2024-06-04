@@ -9,3 +9,4 @@
 * [02-Informer](k8s-yuan-ma-xun-lian-ying/02-informer.md)
 * [03-写一个控制器](k8s-yuan-ma-xun-lian-ying/03-xie-yi-ge-kong-zhi-qi.md)
 * [04-Reflector](k8s-yuan-ma-xun-lian-ying/04-reflector.md)
+* [05-Indexer](k8s-yuan-ma-xun-lian-ying/05-indexer.md)
