@@ -19,3 +19,5 @@
   * [05-Indexer](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/05-indexer.md)
   * [06-DeltaFIFO](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/06-deltafifo.md)
   * [07-workqueue](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/07-workqueue.md)
+* [认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
+  * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
