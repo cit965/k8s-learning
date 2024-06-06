@@ -1,5 +1,7 @@
 # 06-DeltaFIFO
 
+<figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
+
 DeltaFIFO本质上是一个先进先出的队列，有数据的生产者和消费者，其中生产者是Reflector调用的Add方法，消费者是Controller调用的Pop方法。下面分析DeltaFIFO的核心功能：
 
 ```go
@@ -109,16 +111,6 @@ queue字段存储资源对象的key，该key通过KeyOf函数计算得到。item
 
 DeltaFIFO队列中的资源对象在Added（资源添加）事件、Updated（资源更新）事件、Deleted（资源删除）事件中都调用了queueActionLocked函数，它是DeltaFIFO实现的关键:
 
-queueActionLocked代码执行流程如下。
-
-（1）通过f.KeyOf函数计算出资源对象的key。
-
-（2）如果操作类型为Sync，则标识该数据来源于Indexer（本地存储）。如果Indexer中的资源对象已经被删除，则直接返回。
-
-（3）将actionType和资源对象构造成Delta，添加到items中，并通过dedupDeltas函数进行去重操作。
-
-（4）更新构造后的Delta并通过cond.Broadcast通知所有消费者解除阻塞。
-
 ```go
 // Add inserts an item, and puts it in the queue. The item is only enqueued
 // if it doesn't already exist in the set.
@@ -149,6 +141,7 @@ func (f *DeltaFIFO) queueActionLocked(actionType DeltaType, obj interface{}) err
 // ignore emitDeltaTypeReplaced.
 // Caller must lock first.
 func (f *DeltaFIFO) queueActionInternalLocked(actionType, internalActionType DeltaType, obj interface{}) error {
+	//（1）计算出对象的key
 	id, err := f.KeyOf(obj)
 	if err != nil {
 		return KeyError{obj, err}
@@ -174,16 +167,20 @@ func (f *DeltaFIFO) queueActionInternalLocked(actionType, internalActionType Del
 			}
 		}
 	}
-
+	//（2）构造新的Delta，将新的Delta追加到Deltas末尾
 	oldDeltas := f.items[id]
 	newDeltas := append(oldDeltas, Delta{actionType, obj})
+	//（3）调用dedupDeltas将Delta去重（目前只将Deltas最末尾的两个delete类型的Delta去重）
 	newDeltas = dedupDeltas(newDeltas)
 
 	if len(newDeltas) > 0 {
+	//（4）判断对象的key是否在queue中，不在则添加入queue中
 		if _, exists := f.items[id]; !exists {
 			f.queue = append(f.queue, id)
 		}
+		//（5）根据对象key更新items中的Deltas
 		f.items[id] = newDeltas
+		//（6）通知所有的消费者解除阻塞
 		f.cond.Broadcast()
 	} else {
 		// This never happens, because dedupDeltas never returns an empty list
@@ -205,8 +202,7 @@ func (f *DeltaFIFO) queueActionInternalLocked(actionType, internalActionType Del
 
 Pop方法作为消费者方法使用，从DeltaFIFO的头部取出最早进入队列中的资源对象数据。Pop方法须传入process函数，用于接收并处理对象的回调方法，代码示例如下：
 
-```go
-// Pop blocks until the queue has some items, and then returns one.  If
+<pre class="language-go"><code class="lang-go">// Pop blocks until the queue has some items, and then returns one.  If
 // multiple items are ready, they are returned in the order in which they were
 // added/updated. The item is removed from the queue (and the store) before it
 // is returned, so if you don't successfully process it, you need to add it back
@@ -221,8 +217,11 @@ Pop方法作为消费者方法使用，从DeltaFIFO的头部取出最早进入�
 // Pop returns a 'Deltas', which has a complete list of all the things
 // that happened to the object (deltas) while it was sitting in the queue.
 func (f *DeltaFIFO) Pop(process PopProcessFunc) (interface{}, error) {
-	f.lock.Lock()
+<strong>	//（1）加锁
+</strong>	f.lock.Lock()
+	//（9）释放锁
 	defer f.lock.Unlock()
+	//（2）循环判断queue的长度是否为0，为0则阻塞住，调用f.cond.Wait()，等待通知（与queueActionLocked方法中的f.cond.Broadcast()相对应，即queue中有对象key则发起通知）
 	for {
 		for len(f.queue) == 0 {
 			// When the queue is empty, invocation of Pop() is blocked until new item is enqueued.
@@ -235,18 +234,23 @@ func (f *DeltaFIFO) Pop(process PopProcessFunc) (interface{}, error) {
 			f.cond.Wait()
 		}
 		isInInitialList := !f.hasSynced_locked()
+		//（3）取出queue的队头对象key
 		id := f.queue[0]
+		//（4）更新queue，把queue中所有的对象key前移，相当于把第一个对象key给pop出去
 		f.queue = f.queue[1:]
 		depth := len(f.queue)
+		//（5）initialPopulationCount变量减1，当减到0时则说明initialPopulationCount代表第一次调用Replace方法加入DeltaFIFO中的对象key已经被pop完成
 		if f.initialPopulationCount > 0 {
 			f.initialPopulationCount--
 		}
+		//（6）根据对象key从items中获取对象
 		item, ok := f.items[id]
 		if !ok {
 			// This should never happen
 			klog.Errorf("Inconceivable! %q was in f.queue but not f.items; ignoring.", id)
 			continue
 		}
+		//（7）把对象从items中删除
 		delete(f.items, id)
 		// Only log traces if the queue depth is greater than 10 and it takes more than
 		// 100 milliseconds to process one item from the queue.
@@ -260,6 +264,7 @@ func (f *DeltaFIFO) Pop(process PopProcessFunc) (interface{}, error) {
 				utiltrace.Field{Key: "Reason", Value: "slow event handlers blocking the queue"})
 			defer trace.LogIfLong(100 * time.Millisecond)
 		}
+		//（8）调用PopProcessFunc处理pop出来的对象
 		err := process(item, isInInitialList)
 		if e, ok := err.(ErrRequeue); ok {
 			f.addIfNotPresent(id, item)
@@ -270,7 +275,7 @@ func (f *DeltaFIFO) Pop(process PopProcessFunc) (interface{}, error) {
 		return item, err
 	}
 }
-```
+</code></pre>
 
 当队列中没有数据时，通过f.cond.wait阻塞等待数据，只有收到cond.Broadcast时才说明有数据被添加，解除当前阻塞状态。如果队列中不为空，取出f.queue的头部数据，将该对象传入process回调函数，由上层消费者进行处理。如果process回调函数处理出错，则将该对象重新存入队列。
 
