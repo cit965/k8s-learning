@@ -300,3 +300,20 @@ func (p *processorListener) run() {
     }, 1*time.Second, stopCh)
 }
 ```
+
+## ps
+
+有些人可能理解不了pop的两种case，我这里和群里的兄弟们讨论了下，得出结果
+
+**case1：**
+
+将一个 notification 直接推送给 nextCh 后尝试从 pendingNotifications 里读取，如果没有数据，把 nextCh 设置为空，下次直接走case2，如果有数据，继续执行case1，直到 pendingNotifications里没有数据
+
+**case2：**
+
+从 addCh里获取数据，如果没有数据，直接啥也不做
+
+如果发现 notification为空（此时 case1 是关闭的），重新启动case1 (也就是将notification赋值，将nextCh 开启)
+
+如果发现 不为空，说明case1正在执行，直接放入 pendingNotifications 里排队
+
