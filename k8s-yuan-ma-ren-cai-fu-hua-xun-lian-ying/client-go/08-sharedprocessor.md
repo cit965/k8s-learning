@@ -215,6 +215,8 @@ func (p *sharedProcessor) distribute(obj interface{}, sync bool) {
 
 ## processorListener&#x20;
 
+事件添加通过 addCh 通道接受，notification 就是事件，也就是从 DeltaFIFO 弹出的 Deltas，addCh 是一个无缓冲通道，所以可以将其看作一个事件分发器，从 DeltaFIFO 弹出的对象需要逐一送到多个处理器，如果处理器没有及时处理 addCh 则会被阻塞。
+
 ```go
 func (p *processorListener) add(notification interface{}) {
     if a, ok := notification.(addNotification); ok && a.isInInitialList {
@@ -226,16 +228,13 @@ func (p *processorListener) add(notification interface{}) {
 
 前面有说在添加 listener 监听器时, 启动两个协程去执行 pop() 和 run().
 
+run() 和 pop() 是 processorListener 的两个最核心的函数，processorListener 就是实现了事件的缓冲和处理，在没有事件的时候可以阻塞处理器，当事件较多是可以把事件缓冲起来，实现了事件分发器与处理器的异步处理。
+
 * `pop()` 监听 addCh 队列把 notification 对象扔到 nextCh 管道里.
 * `run()` 对 nextCh 进行监听, 然后根据不同类型调用不同的 `ResourceEventHandler` 方法.
 
-让人值得注意的是 `pop()` 方法, 该方法里对数据的搬运有些绕. 你需要细心推敲下代码, 其过程也只是 `addCh -> pendingNotifications -> nextCh` 而已.
-
-addCh 和 nextCh 都是无缓冲的管道, 在这里只是用来做通知, 因为不好预设 channel 应该配置多大, 大了浪费, 小了则出现概率阻塞.
-
-那么如果解决 channel 不定长的问题? k8s 里很多组件都是使用一个 ringbuffer 来实现的元素暂存.
-
 ```go
+// pop：利用 golang select 来同时处理多个 channel，直到至少有一个 case 表达式满足条件为止。
 func (p *processorListener) pop() {
 	defer utilruntime.HandleCrash()
 	defer close(p.nextCh) // Tell .run() to stop
@@ -257,14 +256,47 @@ func (p *processorListener) pop() {
 			if !ok {
 				return
 			}
-			if notification == nil { // No notification to pop (and pendingNotifications is empty)
+			if notification == nil { 
+				// pendingNotifications 为空，则说明没有notification 去pop
+				// No notification to pop (and pendingNotifications is empty)
 				// Optimize the case - skip adding to pendingNotifications
 				notification = notificationToAdd
 				nextCh = p.nextCh
-			} else { // There is already a notification waiting to be dispatched
+			} else { 
+				// There is already a notification waiting to be dispatched
+				// 上一个事件还没发送完成（已经有一个通知等待发送），就先放到缓冲通道中
 				p.pendingNotifications.WriteOne(notificationToAdd)
 			}
 		}
 	}
+}
+```
+
+```go
+func (p *processorListener) run() {
+    // this call blocks until the channel is closed.  When a panic happens during the notification
+    // we will catch it, **the offending item will be skipped!**, and after a short delay (one second)
+    // the next notification will be attempted.  This is usually better than the alternative of never
+    // delivering again.
+    stopCh := make(chan struct{})
+    wait.Until(func() {
+       for next := range p.nextCh {
+          switch notification := next.(type) {
+          case updateNotification:
+             p.handler.OnUpdate(notification.oldObj, notification.newObj)
+          case addNotification:
+             p.handler.OnAdd(notification.newObj, notification.isInInitialList)
+             if notification.isInInitialList {
+                p.syncTracker.Finished()
+             }
+          case deleteNotification:
+             p.handler.OnDelete(notification.oldObj)
+          default:
+             utilruntime.HandleError(fmt.Errorf("unrecognized notification: %T", next))
+          }
+       }
+       // the only way to get here is if the p.nextCh is empty and closed
+       close(stopCh)
+    }, 1*time.Second, stopCh)
 }
 ```
