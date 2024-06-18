@@ -21,6 +21,8 @@
 
 虽然通过 Docker 构建可能更简单，但有时在本地电脑工作进行开发更好。下面的详细信息概述了在 Linux、Windows 和 macOS 上构建的硬件和软件要求。
 
+学习 k8s 源码的第一步就是在本机搭建开发环境，下面我会教大家如何搭建，我的本机为 mac 电脑 m1 芯片, 参考链接如下
+
 #### 硬件要求
 
 * 8GB 内存
@@ -28,11 +30,13 @@
 
 **macOS**
 
+1. 安装一些软件
+
 ```bash
 brew install coreutils ed findutils gawk gnu-sed gnu-tar grep make jq
 ```
 
-您需要在 `.bashrc` 或 shell 初始化脚本的末尾包含此块或类似的内容：
+2. 您需要在 `.bashrc` 或 shell 初始化脚本的末尾包含此块或类似的内容,添加完后记得 source 下：
 
 ```bash
 GNUBINS="$(find `brew --prefix`/opt -type d -follow -name gnubin -print)"
@@ -45,13 +49,35 @@ done
 export PATH
 ```
 
-#### 安装所需软件
+3. 安装 etcd
 
-* **GNU Development Tools GNU 开发工具**
-* **Docker**
-* **rsync**
-*   **etcd**&#x20;
+> 在项目根目录执行 `hack/install-etcd.sh`&#x20;
+>
+> export PATH="$GOPATH/src/k8s.io/kubernetes/third\_party/etcd:${PATH}"
 
-    > ```
-    > export PATH="$GOPATH/src/k8s.io/kubernetes/third_party/etcd:${PATH}"
-    > ```
+4. 通过脚本构建各组件
+
+```bash
+build/run.sh make KUBE_BUILD_PLATFORMS=darwin/arm64
+```
+
+执行完毕后你在项目下 \_output 目录下能够看到编译好的二进制
+
+5. 运行以下命令启动各组件
+
+```go
+./hack/local-up-cluster.sh -O
+```
+
+6. 调试apiserver
+
+```go
+ps -ef | grep kube-apiserver
+kill -9 apiserver
+```
+
+7. 打开goland，复制第六步的启动指令，开启调试,结果如下如
+
+### 其他系统
+
+参考 ： [https://github.com/kubernetes/community/blob/master/contributors/devel/development.md](https://github.com/kubernetes/community/blob/master/contributors/devel/development.md)
