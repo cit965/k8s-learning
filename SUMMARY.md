@@ -22,3 +22,7 @@
   * [08-sharedProcessor](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/08-sharedprocessor.md)
 * [认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
+
+***
+
+* [调试开发k8s](tiao-shi-kai-fa-k8s.md)
