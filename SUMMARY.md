@@ -30,3 +30,4 @@
   * [01-初识 Scheduler](schedule/01-chu-shi-scheduler.md)
   * [02-Schedule Framework](schedule/02-schedule-framework.md)
   * [03-Schedule 源码讲解](schedule/03schedule-yuan-ma-jiang-jie.md)
+  * [04-scheduler 二次开发](schedule/04scheduler-er-ci-kai-fa.md)
