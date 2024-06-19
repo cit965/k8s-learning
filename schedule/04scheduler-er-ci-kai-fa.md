@@ -1,5 +1,7 @@
 # 04-Scheduler 二次开发
 
+## scheduler 两种拓展方式
+
 我们聊了聊Pod是如何被识别出来需要被调度，以及它是怎样被调度到合适的节点上的。在调度过程中，系统会用到一些预设的插件来找到合适的节点。不过，kube-scheduler这个调度器是可以进行个性化扩展的。那么，为什么我们想要扩展它呢？原因可能是预设的插件算法不能满足我们的特定需求。比如，我们可能希望在调度的早期阶段就排除掉带有某些特定标签的节点，或者我们想要根据节点的实际资源使用情况来评分，而不是仅仅看它已经分配了多少资源。在这种情况下，预设的kube-scheduler就不够用了，我们就需要自己开发一个插件来扩展它。
 
 kube-scheduler 扩展的方式主要有下面两种：
@@ -8,6 +10,8 @@ kube-scheduler 扩展的方式主要有下面两种：
 2. **通过调度框架（Scheduling Framework）扩展**：从Kubernetes v1.15版本开始，引入了一种可插拔的调度框架，让定制调度器变得更加简单。你只需要在调度流程的某个点插入自己的插件，甚至可以关闭掉一些不需要的默认插件。这种方式不需要修改kube-scheduler 的代码，而且你的插件会运行在调度器框架内部，就像内置插件一样，因此不需要进行网络调用，稳定性和效率都更高。就像下面的图示，每个箭头都代表一个可以插入自定义插件的扩展点。
 
 本文就根据第二种模式详细讲讲，开发一个自定义的插件需要哪些步骤：
+
+## schedule framework 拓展方式
 
 <figure><img src="../.gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
 
@@ -309,9 +313,11 @@ func (r Registry) Merge(in Registry) error {
 
 ```
 
+## InTree & outofTree
+
 函数 NewInTreeRegistry 返回一个 registry，这个 registry 包含了所有内置插件对象的创建方法。Merge 函数将 NewInTreeRegistry 返回的 registry 和 options.frameworkOutOfTreeRegistry 做合并，那么 options.frameworkOutOfTreeRegistry 是什么呢？很明显，options.frameworkOutOfTreeRegistry 就是我们自定义的插件 registry。
 
-
+## 开发 outofTree
 
 options.frameworkOutOfTreeRegistry 是通过 NewSchedulerCommand 函数的入参进行初始化的，如下代码：
 
