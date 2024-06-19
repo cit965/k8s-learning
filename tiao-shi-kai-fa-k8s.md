@@ -51,9 +51,12 @@ export PATH
 
 3. 安装 etcd
 
-> 在项目根目录执行 `hack/install-etcd.sh`&#x20;
->
-> export PATH="$GOPATH/src/k8s.io/kubernetes/third\_party/etcd:${PATH}"
+在项目根目录执行&#x20;
+
+```bash
+./hack/install-etcd.sh
+export PATH="$GOPATH/src/k8s.io/kubernetes/third_party/etcd:${PATH}"
+```
 
 4. 通过脚本构建各组件
 
@@ -81,3 +84,11 @@ kill -9 apiserver
 ### 其他系统
 
 参考 ： [https://github.com/kubernetes/community/blob/master/contributors/devel/development.md](https://github.com/kubernetes/community/blob/master/contributors/devel/development.md)
+
+
+
+步骤图：
+
+<figure><img src=".gitbook/assets/截屏2024-06-18 16.50.40.png" alt=""><figcaption></figcaption></figure>
+
+<figure><img src=".gitbook/assets/截屏2024-06-18 16.55.07.png" alt=""><figcaption></figcaption></figure>
