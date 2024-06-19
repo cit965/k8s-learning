@@ -2,7 +2,7 @@
 description: scheduler
 ---
 
-# 03-深入理解 scheduler
+# 01-初识 Scheduler
 
 <figure><img src="https://miro.medium.com/v2/resize:fit:1400/0*hGZ6MqU9c1gClWgR.png" alt=""><figcaption></figcaption></figure>
 
