@@ -1,9 +1,13 @@
-# 04-scheduler 二次开发
+# 04-Scheduler 二次开发
 
-我们讲了一个 Pod 是如何被感知到需要调度和如何被调度的，其中在调度过程中寻找合适的 Node 用的都是内置默认的插件，其实 kube-scheduler 是可以扩展的。那么为什么要扩展呢？原因在于默认的插件算法可能并不能满足你的需要，比如我想要在preFilter 阶段就过滤掉带某些标签的节点，又或者我想根据节点实际的资源使用率来打分而不是当前已经分配的资源，那么默认的 kube-scheduler 是无法满足你的要求的，这时候我们就需要开发一个自己的插件对 kube-scheduler 进行扩展。kube-scheduler 扩展的方式主要有下面两种：
+我们聊了聊Pod是如何被识别出来需要被调度，以及它是怎样被调度到合适的节点上的。在调度过程中，系统会用到一些预设的插件来找到合适的节点。不过，kube-scheduler这个调度器是可以进行个性化扩展的。那么，为什么我们想要扩展它呢？原因可能是预设的插件算法不能满足我们的特定需求。比如，我们可能希望在调度的早期阶段就排除掉带有某些特定标签的节点，或者我们想要根据节点的实际资源使用情况来评分，而不是仅仅看它已经分配了多少资源。在这种情况下，预设的kube-scheduler就不够用了，我们就需要自己开发一个插件来扩展它。
 
-1. 使用现有 kube-scheduler 提供的 extender 机制，进行扩展；这种方式就是开发 filter、score、bind的独立运行程序，这种模式允许你使用任何语言开发，开发的程序可以运行在任何 kube-scheduler 可以通过 http 访问访问到的地方；这种模式的优点就是 kube-scheduler 解耦，无需改变 kube-scheduler 代码，只需要增加配置文件即可；但是缺点也很明显，kube-scheduler 需要通过调用API的方式来访问扩展，所以会产生网络IO，这是很重的操作，会降低调度效率，并且还强依赖外部扩展的稳定性
-2. 通过调度框架（Scheduling Framework）进行扩展，Kubernetes v1.15 版本中引入了可插拔架构的调度框架，使得定制调度器这个任务变得更加的容易；这种模式只需要在现有扩展点的某个位置插入自定义的插件即可，还可以关闭默认的插件。这种模式也不需要修改现有的 kube-scheduler 框架代码，跟上一种模式不同的是，他是运行在 kube-scheduler 框架中的，就跟默认的内置插件没有区别，所以不需要 API 调用，稳定性好，效率也高。如下图，每一个箭头都是一个扩展点，每一个扩展点都可以插入自定义插件。本文就根据第二种模式详细讲讲，开发一个自定义的插件需要哪些步骤：
+kube-scheduler 扩展的方式主要有下面两种：
+
+1. **使用扩展器（extender）机制**：这种方式允许你开发独立的程序来执行过滤、评分和绑定操作。你可以用任何编程语言来开发，并且这些程序可以运行在任何kube-scheduler能够通过HTTP访问到的地方。这种方式的好处是，它让调度器和扩展程序保持独立，你不需要修改kube-scheduler的代码，只需要增加一些配置文件。但缺点是，调度器需要通过网络调用这些扩展程序，这会消耗网络资源，可能会降低调度的速度，并且对外部扩展的稳定性有很高的依赖。
+2. **通过调度框架（Scheduling Framework）扩展**：从Kubernetes v1.15版本开始，引入了一种可插拔的调度框架，让定制调度器变得更加简单。你只需要在调度流程的某个点插入自己的插件，甚至可以关闭掉一些不需要的默认插件。这种方式不需要修改kube-scheduler 的代码，而且你的插件会运行在调度器框架内部，就像内置插件一样，因此不需要进行网络调用，稳定性和效率都更高。就像下面的图示，每个箭头都代表一个可以插入自定义插件的扩展点。
+
+本文就根据第二种模式详细讲讲，开发一个自定义的插件需要哪些步骤：
 
 <figure><img src="../.gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
 
@@ -26,7 +30,9 @@ scheduler 的一个成员，就是如下的一个Map
 type Map map[string]framework.Framework
 ```
 
-这个 map 的 key 是 scheduler name, vaule 是 Framework。我们一般在使用 kube-scheduler 时，没有对 kube-scheduler 或他配置文件做修改，此时这个 map 的 key 就只有默认的"default-scheduler"，但是我们现在要开发自己的插件，我们可以在配置文件中定义新的 scheduler name，在这个 scheduler name 中引用自己开发的插件，我们看下下面的配置
+在Kubernetes中，调度器（scheduler）负责决定哪些Pod应该被部署到哪些节点上。通常，我们使用的是Kubernetes自带的默认调度器，它的名字是"default-scheduler"。这个调度器和它的配置文件我们一般不会去改动。
+
+但是，如果你想使用自己开发的插件来实现一些特殊的调度逻辑，就需要创建一个新的调度器。这个过程就像是给这个调度器起一个名字，比如叫"my-custom-scheduler"，然后在配置文件中告诉Kubernetes，这个新的调度器应该使用哪些插件。
 
 ```yaml
 apiVersion: kubescheduler.config.k8s.io/v1beta2
@@ -52,15 +58,18 @@ profiles:
         - name: mySort
 ```
 
-我们在 profiles 中定义了两个 profile，他们的 schedulerName 分别为 my-scheduler-1 和 my-scheduler-2，当这个配置文件被加载后，Profiles（一个map）的 key 就有两个了，即这两个 schedulerName。 想要根据特定配置文件进行调度的 Pod 可以在其 `.spec.schedulerName` 中包含相应的调度程序名称。
+在Kubernetes中，我们可以为不同的调度需求定义多个调度配置文件，这些配置文件被称为"profiles"。每个profile都有一个唯一的调度器名称，比如我们定义了两个profile，它们的调度器名称分别是"my-scheduler-1"和"my-scheduler-2"。这样一来，我们的调度配置文件就会有两个键，分别对应这两个调度器名称。
+
+当你想要让某个Pod使用特定的调度配置，你可以在Pod的配置中指定调度器名称。这可以在Pod的配置文件的`.spec.schedulerName`字段中完成，比如：
+
+```yaml
+spec:
+  schedulerName: my-scheduler-1
+```
+
+这样设置后，Pod就会使用名为"my-scheduler-1"的调度器来进行调度。
 
 
-
-默认情况下，会创建一个名为 `default-scheduler` 的配置文件。此配置文件包括上述默认插件。当声明多个配置文件时，每个配置文件都需要一个唯一的调度程序名称。
-
-
-
-如果 Pod 未指定调度程序名称，kube-apiserver 会将其设置为 `default-scheduler` 。因此，应该存在具有此调度程序名称的配置文件来调度这些 pod。
 
 * **Framerowk**
 
