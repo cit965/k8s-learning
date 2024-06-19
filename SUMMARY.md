@@ -27,5 +27,6 @@
 
 * [调试开发k8s](tiao-shi-kai-fa-k8s.md)
 * [schedule](schedule/README.md)
+  * [03-深入理解 scheduler](schedule/03-shen-ru-li-jie-scheduler.md)
   * [01-Schedule Framework](schedule/01-schedule-framework.md)
   * [02-schedule 源码讲解](schedule/02schedule-yuan-ma-jiang-jie.md)
