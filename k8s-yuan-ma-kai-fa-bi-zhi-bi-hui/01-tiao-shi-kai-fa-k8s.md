@@ -1,4 +1,4 @@
-# 调试开发k8s
+# 01-调试开发k8s
 
 ### 使用 Docker 构建 Kubernete
 
@@ -89,6 +89,6 @@ kill -9 apiserver
 
 步骤图：
 
-<figure><img src=".gitbook/assets/截屏2024-06-18 16.50.40.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/截屏2024-06-18 16.50.40.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src=".gitbook/assets/截屏2024-06-18 16.55.07.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/截屏2024-06-18 16.55.07.png" alt=""><figcaption></figcaption></figure>

@@ -25,7 +25,6 @@
 
 ***
 
-* [调试开发k8s](tiao-shi-kai-fa-k8s.md)
 * [schedule](schedule/README.md)
   * [01-初识 Scheduler](schedule/01-chu-shi-scheduler.md)
   * [02-Schedule Framework](schedule/02-schedule-framework.md)
@@ -33,3 +32,6 @@
   * [04-Scheduler 二次开发](schedule/04scheduler-er-ci-kai-fa.md)
 * [operator](operator/README.md)
   * [01-controller-runtime](operator/01-controller-runtime.md)
+* [k8s 源码开发必知必会](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/README.md)
+  * [01-调试开发k8s](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/01-tiao-shi-kai-fa-k8s.md)
+  * [02- 当你运行 kubectl create deployment 命令时发生了什么](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/02-dang-ni-yun-hang-kubectl-create-deployment-ming-ling-shi-fa-sheng-le-shi-mo.md)
