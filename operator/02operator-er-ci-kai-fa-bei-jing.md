@@ -115,7 +115,7 @@ CRD+custom controller 已经被广泛地使用，按使用场景可划分为以�
 
 ### 如何开发 CRD <a href="#ru-he-kai-fa-crd" id="ru-he-kai-fa-crd"></a>
 
-作为kubernetes开发者，如何开发 CRD+Custom cntroller 呢？其实官方提供示例项目[sample-controller](https://blog.happyhack.io/2020/10/12/kubernetes-crd-day1/)供开发者参考，开发流程大致有以下几个过程：
+作为kubernetes开发者，如何开发 CRD+Custom cntroller 呢？其实官方提供示例项目sample-controller 供开发者参考，开发流程大致有以下几个过程：
 
 1. 初始化项目结构（可根据 sample controller 修改）
 2. 定义 CRD
