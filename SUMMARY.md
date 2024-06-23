@@ -31,6 +31,7 @@
   * [03-Schedule 源码讲解](schedule/03schedule-yuan-ma-jiang-jie.md)
   * [04-Scheduler 二次开发](schedule/04scheduler-er-ci-kai-fa.md)
 * [operator](operator/README.md)
+  * [02-operator 二次开发背景](operator/02operator-er-ci-kai-fa-bei-jing.md)
   * [01-controller-runtime](operator/01-controller-runtime.md)
 * [k8s 源码开发必知必会](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/README.md)
   * [01-调试开发k8s](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/01-tiao-shi-kai-fa-k8s.md)
