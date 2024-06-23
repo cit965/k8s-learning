@@ -12,9 +12,25 @@ description: operator
 
 定制资源可以通过动态注册的方式在运行中的集群内或出现或消失，集群管理员可以独立于集群更新定制资源。 一旦某定制资源被安装，用户可以使用 [kubectl](https://kubernetes.io/zh-cn/docs/reference/kubectl/) 来创建和访问其中的对象，就像他们为 **Pod** 这种内置资源所做的一样。
 
+## Custom resources  Definition <a href="#custom-resources" id="custom-resources"></a>
+
+CRD（Custom Resource Definition，自定义资源定义）提供了定义自定义资源的机制，它可以指定自定义资源的结构、属性、类型等信息。
+
+CRD 有点类似于在数据库中定义的表结构，而 CR 则是基于 CRD 模板创建的一个实例。
+
+有的同学可能会问，既然 CRD 与数据库中定义的表结构类似，那为什么我们不直接使用像 MySQL 这类的数据库来对资源进行抽象和设计呢？
+
+主要原因是 CRD 能够完美地和 Kubernetes 生态进行协同工作，能够使用很多 k8s 特性如准入控制，版本管理，级联删除等。
+
+例如，我们可以通过 kubectl 工具对自定义资源进行 CRUD 等操作，还可以使用 Kubernetes 的认证、权限、审计等机制。这样可以避免重复造轮子，让开发同学将精力集中在业务逻辑的实现上，提高效率并且降低成本。
+
 ## **Custom Controller**
 
-就定制资源本身而言，它只能用来存取结构化的数据。 当你将定制资源与**定制控制器（Custom Controller）** 结合时， 定制资源就能够提供真正的**声明式 API（Declarative API）**。
+就定制资源本身而言，它只能用来存取结构化的数据。 当你将定制资源与**定制控制器（Custom Controller）** 结合时， 定制资源就能够提供真正的**声明式 API（Declarative API）**。Custom Controller 会监听 CR 变化，并做出相应处理。
+
+Kubernetes 本身就自带了一堆 Controller，Master 节点上的三大核心组件之一：Controller Manager，其实就是一堆 Controller 的集合
+
+<figure><img src="../.gitbook/assets/image (18).png" alt=""><figcaption></figcaption></figure>
 
 声明式 API[ ](https://kubernetes.io/zh-cn/docs/concepts/extend-kubernetes/api-extension/custom-resources/#declarative-apis) vs  命令式 API\
 
@@ -115,6 +131,8 @@ CRD+custom controller 已经被广泛地使用，按使用场景可划分为以�
 如果你想要快速构建 CRD 和 Custom controller，脚手架工具是个不错的选择，如果是学习目的，建议结合 sample-controller 和 kubernetes controller 相关 源码。
 
 ### kubebuilder 详解 <a href="#kubebuilder-xiang-jie" id="kubebuilder-xiang-jie"></a>
+
+kubebuilder 是开发自定义控制器的脚手架工具，能给我们搭建好控制器的整个骨架，我们只需要专心编写控制（调谐）逻辑即可，大大方便了控制器的开发流程。
 
 kubebuilder 是一个帮助开发者快速开发 kubernetes API 的脚手架命令行工具，其依赖库 controller-tools 和 controller-runtime， controller-runtime 简化 kubernetes controller 的开发，并且对 kubernetes 的几个常用库进行了二次封装， 以简化开发者使用。controller-tool 主要功能是代码生成。下图是使用 kubebuilder 的工作流程图：
 
