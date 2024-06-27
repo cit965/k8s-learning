@@ -24,6 +24,7 @@
   * [02-Schedule Framework](schedule/02-schedule-framework.md)
   * [03-Schedule 源码讲解](schedule/03schedule-yuan-ma-jiang-jie.md)
   * [04-Scheduler 二次开发](schedule/04scheduler-er-ci-kai-fa.md)
+  * [05-nodeSelector,nodeAffinity](schedule/05-nodeselector-nodeaffinity.md)
 * [operator](operator/README.md)
   * [02-operator 二次开发背景](operator/02operator-er-ci-kai-fa-bei-jing.md)
   * [01-controller-runtime](operator/01-controller-runtime.md)
