@@ -5,12 +5,6 @@
 
 ## k8s源码人才孵化训练营
 
-* [草稿](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/cao-gao/README.md)
-  * [100-k8s架构](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/cao-gao/100k8s-jia-gou.md)
-  * [100-k8s构建编译调试](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/cao-gao/100k8s-gou-jian-bian-yi-tiao-shi.md)
-  * [100-k8s核心数据结构](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/cao-gao/100k8s-he-xin-shu-ju-jie-gou.md)
-  * [100-k8s认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/cao-gao/100k8s-ren-zheng.md)
-  * [100-k8s授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/cao-gao/100k8s-shou-quan.md)
 * [client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/README.md)
   * [01-client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/01-client-go.md)
   * [02-Informer](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/02-informer.md)
@@ -36,3 +30,7 @@
 * [k8s 源码开发必知必会](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/README.md)
   * [01-调试开发k8s](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/01-tiao-shi-kai-fa-k8s.md)
   * [02- 当你运行 kubectl create deployment 命令时发生了什么](k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/02-dang-ni-yun-hang-kubectl-create-deployment-ming-ling-shi-fa-sheng-le-shi-mo.md)
+
+## 开发者要懂的 k8s
+
+* [1 在 k8s 上部署应用](kai-fa-zhe-yao-dong-de-k8s/1-zai-k8s-shang-bu-shu-ying-yong.md)
