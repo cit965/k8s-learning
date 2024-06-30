@@ -2,7 +2,7 @@
 
 进入主题之前，先看看创建pod的大概过程:
 
-<figure><img src="../.gitbook/assets/截屏2024-06-27 17.48.50.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/截屏2024-06-27 17.48.50.png" alt=""><figcaption></figcaption></figure>
 
 1. kubectl向apiserver发起创建pod请求，apiserver将创建pod配置写入etcd
 2. scheduler收到apiserver有新pod的事件，scheduler根据自身调度算法选择一个合适的节点，并打标记pod=test-b-k8s-node01
@@ -33,4 +33,4 @@
 
 > 实际工作中，可能会有这样的情况，需要进一步控制Pod被部署到哪个节点。例如，确保某些Pod最终落在具有SSD硬盘的主机上，又需要确保某些pod落在具体部门的主机上运行，这时就可以使用标签选择器来进行选择。
 
-<figure><img src="../.gitbook/assets/截屏2024-06-27 17.53.21.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/截屏2024-06-27 17.53.21.png" alt=""><figcaption></figcaption></figure>

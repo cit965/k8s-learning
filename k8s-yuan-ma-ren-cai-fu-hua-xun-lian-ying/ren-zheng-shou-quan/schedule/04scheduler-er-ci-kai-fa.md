@@ -13,11 +13,11 @@ kube-scheduler 扩展的方式主要有下面两种：
 
 ## schedule framework 拓展方式
 
-<figure><img src="../.gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
 
 我们先回顾下几个重要的概念：scheduler, framework, registry ，他们之间的关系我用下图来表示：
 
-<figure><img src="../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
 
 * **scheduler**
 

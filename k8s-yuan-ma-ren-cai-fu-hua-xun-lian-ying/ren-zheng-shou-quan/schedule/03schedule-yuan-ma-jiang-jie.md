@@ -1,4 +1,4 @@
-# 02-schedule 源码讲解
+# 03-Schedule 源码讲解
 
 ### Scheduler 对象 <a href="#scheduler-dui-xiang" id="scheduler-dui-xiang"></a>
 
@@ -475,7 +475,7 @@ func (sched *Scheduler) numFeasibleNodesToFind(percentageOfNodesToScore *int32, 
 
 从数据结构的角度来看，整个 “执行插件过滤 -> 筛选 Nodes” 的过程就是一个典型的 `MapReduce` 计算，然后结合源代码中的多个 `goroutine` 并行计算， 最后的流程图如下所示。
 
-<figure><img src="../.gitbook/assets/截屏2024-06-19 10.18.34.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/截屏2024-06-19 10.18.34.png" alt=""><figcaption></figcaption></figure>
 
 ```go
 func (sched *Scheduler) findNodesThatPassFilters(ctx context.Context, pod *v1.Pod, ... nodes []*framework.NodeInfo) ([]*v1.Node, error) {
@@ -675,7 +675,7 @@ func (sched *Scheduler) handleSchedulingFailure(ctx context.Context, ...) {
 
 ## 小节
 
-<figure><img src="../.gitbook/assets/截屏2024-06-19 10.20.15.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/截屏2024-06-19 10.20.15.png" alt=""><figcaption></figcaption></figure>
 
 #### FAQ <a href="#faq" id="faq"></a>
 

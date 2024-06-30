@@ -1,4 +1,4 @@
-# 01-Schedule Framework
+# 02-Schedule Framework
 
 ## Scheduling Framework 调度框架
 
@@ -22,7 +22,7 @@ _scheduling framework_  是 Kubernetes 调度器的可插拔架构，它由一�
 
 下图展示了Pod的调度上下文以及调度框架暴露的接口。
 
-<figure><img src="../.gitbook/assets/image (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (6).png" alt=""><figcaption></figcaption></figure>
 
 ### PreEnqueue
 
@@ -51,7 +51,7 @@ unschedulablePods **存放等待重试的 Pod**，之所以单独设置一个队
 * flushUnschedulableQLeftover：每 30 秒运行一次，将 Pod 从不可调度队列中移动，以允许未由任何事件移动的不可调度 Pod 再次重试。 Pod 必须在队列中停留至少 30 秒才能移动。在最坏的情况下，最多可能需要 60 秒才能移动 Pod。
 * flushBackoffQCompleted：运行回退到活动队列足够长时间的第二个移动 Pod。
 
-<figure><img src="../.gitbook/assets/image (7).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (7).png" alt=""><figcaption></figcaption></figure>
 
 ```go
 // PriorityQueue implements a scheduling queue.
@@ -154,4 +154,4 @@ profiles:
 
 整体路程如下图：
 
-<figure><img src="../.gitbook/assets/image (8).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (8).png" alt=""><figcaption></figcaption></figure>

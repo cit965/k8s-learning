@@ -1,6 +1,6 @@
 # 07-workqueue
 
-<figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 今天我们来详细研究下 workqueue 相关代码。client-go 的 util/workqueue 包里主要有三个队列，分别是普通队列，延时队列，限速队列，后一个队列以前一个队列的实现为基础，层层添加新功能，我们按照 Queue、DelayingQueue、RateLimitingQueue 的顺序层层拨开来看限速队列是如何实现的。
 
@@ -419,7 +419,7 @@ func (r *TypedBucketRateLimiter[T]) Forget(item T) {
 
 ```
 
-<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 令牌桶算法内部实现了一个存放token（令牌）的“桶”，初始时“桶”是空的，token会以固定速率往“桶”里填充，直到将其填满为止，多余的token会被丢弃。每个元素都会从令牌桶得到一个token，只有得到token的元素才允许通过（accept），而没有得到token的元素处于等待状态。令牌桶算法通过控制发放token来达到限速目的。
 
