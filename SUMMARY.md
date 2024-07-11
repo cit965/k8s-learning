@@ -11,6 +11,7 @@
   * [4.3 deployment controller](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.3-deployment-controller.md)
   * [4.4 deployment controller 02](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.4-deployment-controller-02.md)
   * [4.5 deployment controller 03](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.5-deployment-controller-03.md)
+  * [4.6 replicaset controller](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.6-replicaset-controller.md)
 * [operator](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/README.md)
   * [02-operator 二次开发背景](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/02operator-er-ci-kai-fa-bei-jing.md)
   * [01-controller-runtime](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/01-controller-runtime.md)

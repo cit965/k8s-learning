@@ -1,6 +1,6 @@
 # 01-调试开发k8s
 
-### 使用 Docker 构建 Kubernete
+## 使用 Docker 构建 Kubernete
 
 官方 release 是使用 Docker 容器构建的。要使用 Docker 构建 Kubernetes，请遵循以下说明:
 
@@ -17,7 +17,7 @@
 * [`build/make-clean.sh`](https://github.com/kubernetes/kubernetes/blob/a3a49887ee73fa1108adac97a797dec02ccb00d4/build/make-clean.sh)
 * [`build/shell.sh`](https://github.com/kubernetes/kubernetes/blob/a3a49887ee73fa1108adac97a797dec02ccb00d4/build/shell.sh)
 
-### 在本地操作系统/shell 环境上构建 Kubernetes【推荐】
+## 在本地操作系统/shell 环境上构建 Kubernetes【推荐】
 
 虽然通过 Docker 构建可能更简单，但有时在本地电脑工作进行开发更好。下面的详细信息概述了在 Linux、Windows 和 macOS 上构建的硬件和软件要求。
 
@@ -81,7 +81,7 @@ kill -9 apiserver
 
 7. 打开goland，复制第六步的启动指令，开启调试,结果如下如
 
-### 其他系统
+## 其他系统
 
 参考 ： [https://github.com/kubernetes/community/blob/master/contributors/devel/development.md](https://github.com/kubernetes/community/blob/master/contributors/devel/development.md)
 
@@ -92,3 +92,17 @@ kill -9 apiserver
 <figure><img src="../../.gitbook/assets/截屏2024-06-18 16.50.40.png" alt=""><figcaption></figcaption></figure>
 
 <figure><img src="../../.gitbook/assets/截屏2024-06-18 16.55.07.png" alt=""><figcaption></figcaption></figure>
+
+## 调度器goland参数参考
+
+```bash
+--authentication-kubeconfig=/Users/z/.kube/config
+--authorization-kubeconfig=/Users/z/.kube/config
+--bind-address=127.0.0.1
+--kubeconfig=/Users/z/.kube/config
+--leader-elect=false
+```
+
+
+
+<figure><img src="../../.gitbook/assets/截屏2024-07-10 12.42.54.png" alt=""><figcaption></figcaption></figure>
