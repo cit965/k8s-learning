@@ -2,7 +2,7 @@
 
 ## 我们是谁
 
-我们是 中国最大的 k8s 开源人才孵化社区，旨在帮助小伙伴熟悉源码和贡献流程。
+我们是中国最大的 k8s 开源人才孵化社区，旨在帮助小伙伴熟悉源码和贡献流程。
 
 ## 学习目标
 
@@ -24,7 +24,7 @@
 * k8s cka
   * https://space.bilibili.com/28187952/channel/collectiondetail?sid=2177919
 * k8s 源码
-  * https://space.bilibili.com/28187952/channel/collectiondetail?sid=2882387
+  * 抖音课堂(付费)
 
 ## 招聘
 
