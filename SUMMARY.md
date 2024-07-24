@@ -17,6 +17,7 @@
   * [4.9 Kubernetes Service](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.9-kubernetes-service.md)
   * [4.10 endpoint controller](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.10-endpoint.md)
   * [4.11 endpointSlice controller](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.11-endpointslice-controller.md)
+  * [4.12 statefulset controller分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.12-statefulset-controller-fen-xi.md)
 * [operator](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/README.md)
   * [02-operator 二次开发背景](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/02operator-er-ci-kai-fa-bei-jing.md)
   * [01-controller-runtime](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/01-controller-runtime.md)
