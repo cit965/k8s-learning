@@ -5,7 +5,7 @@
 
 ## k8s源码人才孵化训练营
 
-* [controller-manager](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/README.md)
+* [第四章 ：controller-manager 源码](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/README.md)
   * [4.1 controller-manager 介绍](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.1-controllermanager-jie-shao.md)
   * [4.2 controller-manager 代码](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.2-controllermanager-dai-ma.md)
   * [4.3 deployment controller 01](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.3-deployment-controller-01.md)
@@ -19,13 +19,13 @@
   * [4.11 endpointSlice controller](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.11-endpointslice-controller.md)
   * [4.12 statefulset controller分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.12-statefulset-controller-fen-xi.md)
   * [4.13 daemonset controller源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.13-daemonset-controller-yuan-ma-fen-xi.md)
-* [operator](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/README.md)
+* [第三章： operator开发](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/README.md)
   * [02-operator 二次开发背景](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/02operator-er-ci-kai-fa-bei-jing.md)
   * [01-controller-runtime](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/01-controller-runtime.md)
-* [k8s 源码开发必知必会](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/README.md)
+* [第零章 ：阅读源码必知必会](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/README.md)
   * [01-调试开发k8s](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/01-tiao-shi-kai-fa-k8s.md)
   * [02- 当你运行 kubectl create deployment 命令时发生了什么](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/02-dang-ni-yun-xing-kubectl-create-deployment-ming-ling-shi-fa-sheng-le-shen-me.md)
-* [client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/README.md)
+* [第一章：client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/README.md)
   * [01-client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/01-client-go.md)
   * [02-Informer](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/02-informer.md)
   * [03-写一个控制器](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/03-xie-yi-ge-kong-zhi-qi.md)
@@ -34,14 +34,14 @@
   * [06-DeltaFIFO](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/06-deltafifo.md)
   * [07-workqueue](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/07-workqueue.md)
   * [08-sharedProcessor](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/08-sharedprocessor.md)
+* [第二章 ：scheduler 源码](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/schedule/README.md)
+  * [01-初识 Scheduler](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/schedule/01-chu-shi-scheduler.md)
+  * [02-Schedule Framework](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/schedule/02-schedule-framework.md)
+  * [03-Schedule 源码讲解](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/schedule/03schedule-yuan-ma-jiang-jie.md)
+  * [04-Scheduler 二次开发](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/schedule/04scheduler-er-ci-kai-fa.md)
+  * [05-nodeSelector,nodeAffinity](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/schedule/05-nodeselector-nodeaffinity.md)
 * [认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
-  * [schedule](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/README.md)
-    * [01-初识 Scheduler](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/01-chu-shi-scheduler.md)
-    * [02-Schedule Framework](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/02-schedule-framework.md)
-    * [03-Schedule 源码讲解](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/03schedule-yuan-ma-jiang-jie.md)
-    * [04-Scheduler 二次开发](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/04scheduler-er-ci-kai-fa.md)
-    * [05-nodeSelector,nodeAffinity](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/05-nodeselector-nodeaffinity.md)
 
 ## 开发者要懂的 k8s
 
