@@ -40,6 +40,7 @@
   * [4.11 endpointSlice controller](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.11-endpointslice-controller.md)
   * [4.12 statefulset controller分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.12-statefulset-controller-fen-xi.md)
   * [4.13 daemonset controller源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.13-daemonset-controller-yuan-ma-fen-xi.md)
+  * [4.16 k8s GC](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.16-k8s-gc.md)
 * [认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
 
