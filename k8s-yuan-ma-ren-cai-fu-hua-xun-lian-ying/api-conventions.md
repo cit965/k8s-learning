@@ -108,4 +108,453 @@ Kubernetes API还作为系统声明性配置模式的基础。为了促进声明
 
 一些不会在在系统中持久化的对象 – 例如`SubjectAccessReview`和其他 webhook风格调用 – 可能会选择添加_规范_和_状态_来封装“调用和响应”模式。规范是请求（通常是信息请求），状态是响应。对于这些类似RPC的对象，唯一的操作可能是POST，但是在提交和响应之间具有一致的模式可以降低这些客户端的复杂性。
 
+**Typical status properties**
+
+**条件（Conditions）** 为控制器的高层级的状态报告提供了一个标准机制。它们是一种扩展机制，允许工具和其他控制器收集有关资源的摘要信息，而无需了解特定于资源的状态详细信息。控制器要将挂测到的对象的详尽状态补充写入到_条件_中，而不是替换它。例如，部署的“可用”条件可以通过检查部署的就绪副本（readyReplicas）、副本（replicas）和其他属性来确定。“可用”条件避免其他组件重复编写判断Deployment可用性的逻辑。
+
+资源对象的条件报告可以包含多个条件，在未来也可以添加新的条件，也可以由其他第三方控制器添加新条件。因此，条件时使用列表来表示，每个条件有一个类似的结构。该列表应实际上应当认为是一个map，以`type`为字典的key。
+
+当条件遵循一致性的约定时，他们是最有用的：
+
+* 应添加条件以明确传达用户和组件关心的属性，而不是要求从其他观察中推断出这些属性。一旦定义，条件的含义就不能随意更改 – 它成为API的一部分，并且与API的任何其他部分具有相同的向后和向前兼容性考虑。
+* 控制器应在第一次看到资源对象时将其条件应用于资源对象，即使状态（stauts）为未知（Unknown）。这允许系统中的其他组件知道条件存在，并且控制器正在调和（reconcile）该资源方面取得进展（译注：让别人知道我正在处理）。
+  * 并不是所有的控制器都会遵守关于报告“Unknown”或“False”值的建议。对于已知条件，条件状态的缺失应解释为与未知相同，通常表示协调尚未完成（或资源状态可能尚不可观察）。
+* 对于某些情况，True表示正常运行，而对于某些情况，False表示正常运行。（“正常-真”条件有时被称为具有“正极性”，而“正常-假”条件有时被称为具有“负极性”。）如果不进一步了解这些条件，就不可能计算出通用摘要资源的条件。
+* 条件类型（type）名称应该对人类有意义；作为一般规则，无论是正极性还是负极性都不能被推荐。 像“MemoryExhausted”这样的负面条件对于人类来说可能比“SufficientMemory”更容易理解。 相反，“Ready”或“Succeeded”可能比“Failed”更容易理解，因为“Failed=Unknown”或“Failed=False”可能会导致双重否定混淆。
+* 条件类型名称应该描述资源的当前观察状态，而不是描述当前状态转换。这通常意味着名称应该是形容词（“Ready”、“OutOfDisk”）或过去时动词（“Succeeded”、“Failed”）而不是现在时动词（“Deploying”）。可以通过将条件的状态（status）设置为未知（Unknown）来指示中间状态。
+  * 对于需要很长时间（例如超过1分钟）的状态转换，将转换本身视为观察到的状态是合理的。在这些情况下，条件（例如“Resizing”）本身不应是瞬态的，而应使用True/False/Unknown模式发出信号。这允许其他观察者确定来自控制器的最后一次更新，是成功还是失败。在状态转换无法完成且继续协调不可行的情况下，应使用原因和消息来指示转换失败。
+* 在为资源设计条件时，有一个通用的顶级条件来概括更详细的条件会很有用。简单的消费者可以简单地查询顶级条件。尽管它们不是一致的标准，但API设计人员可以将`Ready`和`Succeeded`条件类型分别用于长时间运行和有限执行的对象。
+* 对于资源`Foo`，定义了`FooCondition`代表该资源的状态，可以包含下列字段，其中`type`和`status`两个字段是必须有的，其他字段可以没有：
+
+```go
+  Type               FooConditionType   `json:"type" description:"type of Foo condition"`
+  Status             ConditionStatus    `json:"status" description:"status of the condition, one of True, False, Unknown"`
+
+  // +optional
+  Reason             *string            `json:"reason,omitempty" description:"one-word CamelCase reason for the condition's last transition"`
+  // +optional
+  Message            *string            `json:"message,omitempty" description:"human-readable message indicating details about last transition"`
+
+  // +optional
+  LastTransitionTime *unversioned.Time  `json:"lastTransitionTime,omitempty" description:"last time the condition transit from one status to another"`
+```
+
+以后可以添加新的字段。
+
+不要使用你不需要的字段 – 简单更好。
+
+鼓励使用`Reason`字段。
+
+条件的类型（type）应该以驼峰形式命名，优先使用剪短的名称（如Ready，而不是MyResourceReady）。
+
+条件的状态（status）值可以是`True`，`False`或`Unknown`。如果条件确实，应该认为其状态为Unknown。控制器如何处理Unknown取决于所讨论的条件。
+
+围绕条件的思考随着时间的推移而发展，因此有几个广泛使用的非规范示例。
+
+通常，条件值可能会来回变化，但某些条件转换可能是单调的，具体取决于资源和条件类型。然而，条件是观测而不是状态机，我们也没有为对象定义全面的状态机，也没有与状态转换相关的行为。该系统是基于level-based的而不是edge-triggered的，并且应该假设一个开放世界（译注：类似epoll的水平和边缘）。
+
+例如对于类型为“Ready”的条件，该条件表明资源对象在最后一次探测时被认为是完全可操作的。对于一个可能的单调（monotonic）条件的类型可能是`Succeeded`，`Succeeded`的`True`状态（status）意味着完成并且资源不再处于活动状态。仍处于活动状态的对象通常具有状态为未知（Unknown）的成功（Succeeded）条件。
+
+v1 API中的一些资源包含称为`**phase**`的字段，以及相关的`message`、`reason`和其他状态字段。不推荐使用`phase`的模式。较新的API类型应改为使用条件。Phase本质上是一个状态机枚举字段，它与系统设计原则相矛盾并阻碍了后续演化，因为添加新的枚举值会破坏向后兼容性。与其鼓励客户从phase推断隐含属性，我们更愿意明确地公开客户需要监控的各个条件。条件还具有这样的好处，即可以在所有资源类型中创建一些具有统一含义的条件，同时仍然公开特定资源类型独有的其他条件。有关更多详细信息和讨论，请参阅[#7856](http://issues.k8s.io/7856)。
+
+在条件类型以及它们出现在API中的其他任何地方，`Reason`旨在成为一个单词，CamelCase表示当前状态的原因类别，而`Message`旨在成为人类可读的短语或句子，可能包含个别事件的具体细节。 `Reason`旨在用于简洁的输出，例如单行`kubectl get`输出，以及总结发生的原因，而`Message 旨在以详细的状态说明呈现给用户，例如`kubectl describe\`输出。
+
+历史信息状态（例如，上次转换时间、失败次数）仅通过合理努力提供，不保证不会丢失。
+
+一些资源在状态中报告`observedGeneration`，这说明状态反映的是针对最近观察到的`generation`的期望状态（译注：参考metadata中字段说明）。例如，这可用于确保报告的状态反映最新的所需状态。（译注：例如对spec修改，generation变化，status中反映的是对应generation的观测状态，想象一个资源的调和耗时5秒，创建后一秒进行修改）。
+
+**References to related objects**
+
+对松散耦合对象集的引用，例如由[replication controller](https://kubernetes.io/docs/user-guide/replication-controller/)监管的[pods](https://kubernetes.io/docs/user-guide/pods/)，通常最好使用[标签选择器](https://kubernetes.io/docs/user-guide/labels/)来引用。为了确保单个对象的GET在时间和空间上保持有界，这些集合可以通过单独的 API查询进行查询，但不会扩展查询相关引用对象的状态（译注：说的是不使用类似外键的方式，而是通过标签进行关联）。
+
+有关特定对象的引用，请参阅对象引用。
+
+**Lists of named subobjects preferred over maps**
+
+在[#2004](http://issue.k8s.io/2004)和其他地方讨论过。任何API对象中都不使用字典容纳子对象。相反，约定是使用包含名称（name）字段的子对象列表。Kubernetes[文档](https://kubernetes.io/docs/reference/using-api/server-side-apply/#merge-strategy)中更详细地描述了这些约定，以及如何更改lists、structs和maps的语义（semantics）。
+
+例如：
+
+```
+ports:
+  - name: www
+    containerPort: 80
+```
+
+对比
+
+```
+ports:
+  www:
+    containerPort: 80
+```
+
+此规则保持API对象中所有JSON/YAML键的不可变性。唯一的例外是API中的纯映射（目前labels，selectors，annotations，data），而不是子对象集。
+
+**Primitive types**
+
+* 尽量避免使用浮点值，绝不要在`spec`中使用浮点值。浮点值在传输过程中会被编码和重接解码，可能会发生变化，因此是不可靠的，并且在不同的语言和体系结构中具有不同的精度和表示。
+* 所有数字（例如，uint32、int64）会被Javascript和其他一些语言转换为float64，因此字段值的取值范围或精度上超过该值（译注：指float64）的字段（特别是整数值 > 53 位）都应该被序列化并作为字符串使用。
+* 不要使用无符号整数，因为跨语言和库的支持不一致。
+* 不要使用枚举值，而是使用string别名（如`NodeConditionType`）。
+* 查看API中的类似字段（例如，端口、持续时间）并遵循现有字段的约定（译注：尽量参考现有API）。
+* 所有公共整数型字段必须使用Go的`(u)int32`或`(u)int64`类型，而不是`(u)int`（取决于目标平台，这是不明确的）。内部类型可以使用`(u)int`。
+* 对于使用布尔类型字段，需要多加考虑。许多想法以布尔值开始，但最终趋向于一小部分互斥选项。通过将策略选项明确描述为字符串类型别名（例如`TerminationMessagePolicy`）来规划未来的扩展。
+
+**Constants**
+
+某些字段的值可能会被限定为一个枚举列表。这些值是字符串，它们将采用驼峰（CamelCase）形式，首字母大写。示例：ClusterFirst、Pending、ClientIP。当单词是首字母缩写词时，首字母缩写词中的每个字母都应大写，例如 ClientIP 或 TCPDelay。当专有名称或命令行可执行文件的名称用作常量时，专有名称应以一致的大小写表示 – 示例：systemd、iptables、IPVS、cgroupfs、Docker（作为通用概念）、docker（作为命令行可执行文件）。如果使用了混合大写的专有名称，例如 eBPF，则应将其保留在更长的常量中，例如 eBPFDelegation。
+
+Kubernetes中的所有API都必须利用这种风格的常量，包括标志和配置文件。在以前使用不一致常量的情况下，新标志应该只是驼峰形式，并且随着时间的推移，旧标志应该被更新以使用驼峰形式值以及不一致的常量。示例：Kubelet的–topology-manager-policy标志，其值为 none、best-effort、restricted和single-numa-node。这个标志应该接受 None、BestEffort、Restricted和SingleNUMANode。如果向该标志添加新值，则应支持两种形式。
+
+\
+**Unions**
+
+有时，一组字段中最多可以设置其中一个字段的值。例如，PodSpec的\[volumes]字段有17个不同的卷类型特定字段，例如nfs和iscsi。集合中的所有字段都应该是可选的。
+
+有时，当创建一个新类型时，api设计者可能会预料到将来会需要一个联合，即使最初只允许一个字段。在这种情况下，请务必将字段设为可选的，如果字段没有设置一个唯一的值，您仍然可能返回错误。不要为该字段设置默认值。
+
+#### Lists and Simple kinds
+
+每个列表或简单类型都应该在metadata对象的字段中具有以下元数据：
+
+resourceVersion：一个字符串，标识列表中返回的对象的通用版本。这个值必须被客户端视为不透明的（对于客户端没意义），并且不加修改地传回服务器。资源版本仅在单个命名空间下的单个资源类型有效。服务器返回的每个简单类型，以及发送到服务器的要支持幂等性或乐观并发的简单类型要应该返回这个值。由于简单资源经常被用作修改对象的输入替代动作，所以简单资源的资源版本应该与对象的资源版本相对应。（译注：修改版本为1的资源，返回的版本也是1，以及修改的数据，如果有别人同时进行修改，服务端的版本号增加了，本次修改失败）
+
+\
+
+
+### Differing Representations
+
+### Verbs on Resources
+
+API资源应该使用传统的REST模式：
+
+* `GET /<resourceNamePlural>` – 获取列表，例如GET /pods返回pods列表。
+* `POST /<resourceNamePlural>` – 通过客户端提供的JSON对象创建一个新的资源。
+* `GET /<resourceNamePlural>/<name>` – 获取具有指定名称的单个资源实例，例如GET /pods/first返回一个名称为first的Pod资源。应该在一个常数的时间内返回（译注：参考SLI/SLO），并且资源的大小应该是有界的。
+* `DELETE /<resourceNamePlural>/<name>` – 删除具有指定名称的单个资源实例。可以指定`gracePeriodSeconds`删除选项（DeleteOptions），该选项表示在资源真正删除之前的一个宽限时间，单位是秒。
+* `DELETE /<resourceNamePlural>` – 删除`<resourceName>`列表，如 `DELETE /pods`删除pods列表。
+* `PUT /<resourceNamePlural>/<name>` – 使用客户端提供的JSON对象创建或更新指定名称的资源。是否可以使用PUT请求创建资源取决于特定资源的存储策略配置，特别是 `AllowCreateOnUpdate()`返回值。大多数内置类型不允许这样做（译注：可参考pkg/registry/apps/deployment/storage/storage.go）。
+* `PATCH /<resourceNamePlural>/<name>` – 选择性修改资源的指定字段。参考下面更详细的内容。
+* `GET /<resourceNamePlural>?watch=true` – 监视JSON对象的流，相当于是订阅了资源对象随着时间的变更。
+
+#### PATCH operations
+
+kubernetes api支持不同的patch模型，具体使用的模型根据请求的`Content-Type`决定：
+
+* JSON Patch：`Content-Type: application/json-patch+json`
+  * 如[RFC6902](https://tools.ietf.org/html/rfc6902)定义，JSON Patch是对资源对象执行的一些列动作，如`{"op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ]}`。对于更详细内容可参考该RFC文档。
+* Merge Path：`Content-Type: application/merge-patch+json`
+  * 如[RFC7386](https://tools.ietforg/html/rfc7386)定义，Merge Patch本质上是资源的部分的表示。提交的JSON与当前资源“合并”以创建一个新的，然后保存新的。有关如何使用Merge Patch的更多详细信息，请参考该RFC文档。
+* Strategic Merge Patch：`Content-Type: application/strategic-merge-patch+json`
+  * Strategic Merge Patc是Merge Path的自定义实现。有关它的工作原理以及为什么需要引入它的详细说明，请参见[此处](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md)。
+
+### Idempotency
+
+所有兼容Kubernetes API的接口必须支持“名称幂等性”，并在POST请求的对象名称与与系统中现有对象具有相同名称时返回HTTP 409状态码。有关详细信息，请参阅[标识符](https://kubernetes.io/docs/user-guide/identifiers/)文档。
+
+可以通过`metadata.generateName`请求系统生成名称（names）。GenerateName表示这个名称应该在持久化之前要使之独唯一。该字段如果非空的话则表示想要一个唯一的名称（返回给客户端的名称会和之前发送给服务端的不同）。如果资源的名称字段未指定，则名称将会以该字段和一个唯一的后缀组成。该字段的值必须符合名称规则。如果指定了该字段，并且没有指定名称的情况下，如果生成的名称在系统中已经存在，将不会返回409，而是返回201 Created，或者504 ServerTimeout（表明在分配的时间内找不到一个唯一的名称），在发生504的情况下客户端应该进行重试（可选的使用Retry-After的头中说明的时间）。
+
+Optional vs. Required
+
+字段要么是可选的，要么是必须的。
+
+可选字段有如下属性：
+
+* 在字段注释中有`+optional`标签（译注：参考code-gen）
+* 字段是一个指针类型（如`AwesomeFlag *SomeFlag`）或者由内置`nil`值（如maps和slices）
+* API server允许POST和PUT这些可选字段未设置值的资源
+
+在大多数场景下，可选字段同时应该有`omitempy`结构体标签（struct tag）（`emitempty`说明如果该字段拥有一个空值，在进行json编码的时候应该省略）。然而，如果你对可选字段想要区分处理未提供值和提供空值的情况，则不能使用`emitempty`（如\[kubernetes/kubernetes#34641(https://github.com/kubernetes/kubernetes/issues/34641)]）。
+
+注意，考虑到向后兼容性，任何有`emitempty` struct tag的字段会被认为是可选的，但是未来可能会改变这种行为，非常推荐使用`+optionnal`。
+
+必须字段拥有相反的属性，即：
+
+* 字段注释中没有`+optional`
+* 没有`omitempty`结构体标签
+* 不是指针类型（如`AnotherFlag SomeFlag`）
+* 如果这些字段没有设置值，API server应不允许POST和PUT这样的资源
+
+使用`+optional`和`omitempty`将会在OpenAPI文档中反映出来该字段是可选的。
+
+使用指针可以区分未设置值和空值的情况。原则上，在一些情况下，对于可选字段不必使用指针，因为空值是不允许的，因此隐含的意思就是未设置值。在代码库中有一些列子。然而：
+
+* 实现者可能难以预测可能需要将空值与零值区分开的所有情况
+* 即使指定了omitempty，编码器输出也不会省略结构，比较混乱
+* 使用指针总是能够让GO客户端和其他使用该类型的任何客户端明确的知道字段是可选的
+
+因此，对于没有内置`nil`值的类型，我们要求对于可选字段总是使用指针。
+
+\
+Defaulting
+
+默认值是特定于API版本的，并且他们会在特定版本的API的资源定义转换到代表期望状态（`Spec`）的内部对象时进行应用。后续在获取（GETs）资源时将会明确的包含这些默认值。
+
+将默认值合并到`Spec`可确保`Spec`描述完整的期望状态，以便系统更容易确定如何实现该状态，并让用户知道预期什么。
+
+对于字段的默认值，可以通过`+default=`标签指定。原始类型字段会在反序列化JSON对象的过程中对其赋值。如果字段没有指定`omitempty` json标签，并且没有指定默认值时，字段将被赋予该类型的默认值。
+
+参考[该文档](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#defaulting)了解更多信息。
+
+API版本特定的默认值由API server设置。
+
+Late Initialization
+
+延迟初始化是指资源在创建或更新后，有系统的控制器对其字段进行赋值。
+
+例如，调度器会pod创建之后设置`pod.spec.nodeName`字段。
+
+延迟初始化只能够做下列类型的修改：
+
+* 为未设置值的字段赋值
+* 向字典中添加键（译注：如label，annotation）
+* 向具有合并语义的数组中添加值（类型定义中，具有`patchStrategy:"merge"`属性）（译注：参考vendor/k8s.io/api/core/v1/types.go中Env）
+
+约定：
+
+* 允许用户（具有足够权限）通过设置原本会被默认的字段来覆盖任何系统默认行为
+* 使来自用户的更新能够与后期初始化期间所做的更改通过strategic merge patch合并，而不是破坏更改
+* 允许进行后期初始化的组件使用strategic merge patch，有助于此类组件的组合和并发
+
+尽管apiserver准入控制阶段在对象创建之前起作用，但准入控制插件也应该遵循后期初始化约定，以允许稍后将它们的实现移动到“控制器”或客户端库。
+
+### Concurrency Control and Consistency
+
+kubernetes使用资源版本（resource versions）实现乐观的并发控制。所有kubernetes资源的metadata中都有一个“resourceVersion”字段。该字段是一个字符串，表示资源的内部版本，客户端可以根据该字段确定资源是否发生变化。当资源将要更新时，他的版本将会和之前保存的版本进行对比，如果不匹配，将会失败并返回StatusConflict（HTTP状态码409）。
+
+每次资源对象发生修改时，resourceVersion都会变化。如果在PUT的资源对象包含了resourceVersion，那么系统会对确认当前的resourceVersion和请求中的匹配，以确保在整个读取/修改/写入的环节中没有其修改周期内没有其他成功的资源变动。
+
+当前resourceVersion是由[etcd‘s modifiedIndex](https://coreos.com/etcd/docs/latest/v2/api.html)支持。但是，应用不应该依赖kubernetes版本系统的实现细节。将来，我们可能会改变resourceVersion的实现，如变成基于每个对象的时间戳计数。
+
+对于客户端来说，要得知resourceVersion的唯一方式是从前一个操作的server响应中获取，典型的如GET。该值对于客户端没有什么实际意义，并且要原封不动的传回给server。客户端不应设想资源版本在不同的命名空间，不同资源类型和不同的server之间有什么含义。当前，resourceVerion的值被设置为etcd的sequencer。你可以认为它是一个逻辑时钟，api server可以用来对请求排序。但是，我们预期在将来会改变resourceVersion的实现，例如我们对kind或namespace进行分片（shard），或者移植到其他存储系统。
+
+在出现冲突（conflict）的情况下，客户端的正确操作是再次获取该资源，应用变更，然后提交变更。该机制可以防止下列情况的竞争：
+
+```
+Client #1                                  Client #2
+GET Foo                                    GET Foo
+Set Foo.Bar = "one"                        Set Foo.Baz = "two"
+PUT Foo                                    PUT Foo
+```
+
+当这两个操作并行进行，Foo.Bar或者Foo.Baz其中一个修改会丢失。
+
+另一方面，其中一个PUT会失败，因为无论哪一个成功都会改变resourceVersion。
+
+在未来，resourceVersion可以用作其他操作（例如GET、DELETE）的前提条件，例如在存在缓存的情况下实现read-after-write一致性。
+
+“Watch”操作中在查询参数中指定resourceVersion。用来指定从哪个点开始监视资源。这可用于确保在GET资源（或资源列表）和后续Watch之间不会遗漏任何变动，即使资源的当前版本更新。这是目前列表操作（GET资源列表）返回resourceVersion的主要原因。\
+
+
+### Serialization Format
+
+根据Accept头，api可以返回其资源的他其他表示形式，但是请求和相应的默认的序列化方式必须是JSON。
+
+对于内置的资源类型（译注：如pod），也支持protobuf编码。由于proto不是自描述的，因此有一个信封包装器来描述内容的类型。
+
+所有日期都应序列化为RFC3339字符串。
+
+### Units
+
+单位必须在字段名称中明确显示（例如`timeoutSeconds`），或者必须指定为值的一部分（例如`resource.Quantity`）(译注：apimachinery中的类型)。哪种方法更受欢迎待定，尽管目前我们使用`fooSeconds`约定表示持续时间(durations)。
+
+Duration字段必须定义为integer类型，并且字段名中有单位说明（如`leaseDurationSeconds`）。我们没有在API中使用Duration是因为这可能需要客户端实现go兼容的字符串解析。
+
+### Selecting Fields
+
+一些API可能需要识别JSON对象中哪个字段无效，或其他用途。当前推荐方式是使用标准的javaScript语法访问字段，假定这个JSON对象被转换成了javaScript对象，没有前缀的点，如`metadata.name`。
+
+示例：
+
+* 在一个“fields”数组中的第二个元素的“state”对象中找到“current”字段：`fields[1].state.current`
+
+### Object reference
+
+命名空间类型（namespaced type）上的对象引用通常应该只引用同一命名空间中的对象。 由于命名空间是一个安全边界，跨命名空间引用可能会产生意想不到的影响，包括：
+
+* 将有关一个命名空间的信息泄漏到另一个命名空间。在原始资源对象中放置有关被引用对象的状态消息甚至是一些内容是很自然的。这是跨命名空间的问题。
+* 对其他命名空间的潜在入侵。引用通常可以访问一条被引用的信息，因此能够跨命名空间表达“给我那个”是危险的，而不需要额外的工作来进行权限检查或从两个涉及的命名空间中选择加入。
+* 一方无法解决的参照完整性问题。从namespace/A引用namespace/B并不意味着可以控制另一个命名空间。这意味着您可以引用无法创建或更新的事物。
+* 删除时语义不明确。如果命名空间资源被其他命名空间引用，则删除引用的资源是否会导致删除，或者是否应该强制保留引用的资源。
+* 创建时的语义不明确。如果引用的资源是在其引用之后创建的，则无法知道它是预期的资源还是使用相同名称创建的不同资源。
+
+内置类型和ownerReferences不支持跨命名空间引用。如果非内置类型选择跨命名空间引用，则应清楚地描述上述边缘情况的语义，并应解决权限问题。这可以通过双重选择（来自推荐人和被推荐人的选择）或在准入时执行的辅助权限检查来完成。
+
+#### Naming of the reference field
+
+引用字段的名称应采用“{field}Ref”格式，后缀中始终包含“Ref”。
+
+“{field}”部分应该表明引用的目的。例如，“targetRef”表明该引用的是target。
+
+可以让“{field}”组件指示资源类型。例如，引用密钥时的“secretRef”。但是，如果该字段被扩展为引用多个类型，则存在该字段被误称的风险。
+
+在引用对象列表的场景下，该字段应采用“{field}Refs”格式，同时遵循上面单个引用的情况的指导。
+
+#### Referencing resources with multiple versions
+
+大多数资源都具有多个版本。例如，核心（core）资源会经历alpha逐渐变化到GA版本。
+
+控制器应假定资源的版本会变化，并做出恰当的错误处理。
+
+#### Handling of resources that do not exist
+
+在很多场景下会出现期望的资源不存在，例如：
+
+* 资源的目标版本不存在
+* 在集群启动过程中资源还未被加载
+* 用户错误
+
+控制器的编写应假定所引用的资源可能不存在，并包括错误处理以使用户清楚地了解问题。
+
+#### Validation of fields
+
+在_对象应用_中的使用的很多值都用做API路径（译注：url path）的一部分。例如，在路径中使用对象名称来标识对象。未经清理，这些值可用于尝试检索其他资源，例如通过使用具有语义含义的值，例如..或/。
+
+在将字段用作API请求中的路径段之前让控制器验证字段，并发出一个事件来告诉用户验证失败。
+
+有关合法对象名称的更多信息，请参阅[对象名称和ID](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/)。
+
+#### Do not modify the referrd object
+
+为了最大限度地减少潜在的权限提升，不要修改被引用的对象，或者限制对同一命名空间中的对象的修改并限制允许的修改类型（例如，HorizontalPodAutoscaler控制器仅写入`/scale`子资源）。
+
+#### Minimize copying or printing values to the referrer objecgt
+
+由于控制器的权限可能与控制器正在管理的对象的作者的权限不同，因此对象的作者可能没有查看引用对象的权限。因此，将有关被引用对象的任何值复制到引用对象可以被视为权限升级，使用户能够读取他们以前无法访问的值。
+
+相同的场景适用于将有关被引用对象的信息写入事件。
+
+通常，不要将从引用对象检索到的信息写入或打印到规范、其他对象或日志中。
+
+必要时，考虑这些值是否是引用者对象的作者可以通过其他方式访问的值（例如，正确填充对象引用已经需要）。
+
+#### Object References Examples
+
+以下部分说明了各种对象引用方案的推荐架构。
+
+下面概述的模式旨在随着可引用对象类型的扩展启用纯粹的附加字段，因此是向后兼容的。
+
+例如，可以从一种资源类型转到多种资源类型，而无需对架构进行重大更改。
+
+**Single resource reference**
+
+单一种类的对象引用很简单，因为控制器可以硬编码识别对象所需的大多数限定符。例如，唯一需要提供的值是名称（和命名空间，尽管不鼓励跨命名空间引用）：
+
+```
+# for a single resource, the suffix should be Ref, with the field name
+# providing an indication as to the resource type referenced.
+secretRef:
+    name: foo
+    # namespace would generally not be needed and is discouraged,
+    # as explained above.
+    namespace: foo-namespace
+```
+
+仅当计划始终仅引用单个资源时才应使用此模式。如果可以扩展到多种资源类型，请使用多资源引用。
+
+\
+**Controller behavior**
+
+operator应该知道它需要从中检索值的对象的版本、组和资源名称，并且可以使用发现客户端（discovery client ）（译注：client-go discovery）或直接构造API路径(path)。
+
+**Multiple resource reference**
+
+当引用可以指向一组限定的有效资源类型时，使用多类对象引用。
+
+与单一类型对象引用一样，operator可以提供缺失的字段，前提是存在的字段足以在支持的类型集中唯一标识对象资源类型。
+
+```
+# guidance for the field name is the same as a single resource.
+fooRef:
+    group: sns.services.k8s.aws
+    resource: topics
+    name: foo
+    namespace: foo-namespace
+```
+
+译注：/apis/sns.services.k8s.aws/v1/namespaces/foo-namespace/topics/foo
+
+尽管并不总是需要帮助控制器识别资源类型，但当资源存在于多个组中时，包含“组(group)”以避免歧义。它还为最终用户提供了清晰度，并允许复制粘贴引用，而不会由于处理引用的不同控制器而改变引用的类型。
+
+**Kind vs. Resource**
+
+对象引用的一个常见混淆点是是否使用“种类（kind）”或“资源（resource）”字段构造引用。历史上，kubernetes中的大多数对象引用都使用了“kind”。这不像“resource”那么精确。虽然“组（group）”和“资源（resource）”的每个组合在 Kubernetes 中都必须是唯一的，但“组（group）”和“种类(kind)”并不总是如此。多个资源可以使用相同的“种类（kind）”。
+
+通常，kubernetes中的所有对象都有一个规范的主要资源 – 例如“pods”，代表创建和删除“Pod”类型对象的方式。虽然有的资源可能无法直接创建，例如”Scale”对象仅用在一些工作负载的“scale”子资源上，但大多数对象引用通过其结构（schema）寻址主要资源。在对象引用的上下文中，“kind”指的是结构（schema），而不是资源。
+
+如果在实现对象引用时，总是能够有一个明确的方式映射类型（kind）到资源（resource），那么在对象引用中使用类型（kind）是可接收的。通常，这需要实现要有一个预先定义的类型（kind）到资源（resource）的映射（这就是内置引用使用kind的场景）。依赖动态的类型到资源的映射是不安全的。即使一开始一个类型仅映射到一个资源，有可能别的资源会引用相同的类型，可能打破任何动态资源映射。
+
+如果对象引用可用于引用任意类型的资源，并且类型和资源之间的映射可能不明确，则应在对象引用中使用“资源”。
+
+ingress api提供了一个很好的例子，说明对象引用在哪里可以接受“类型（kind）”。 api支持后端引用作为扩展点。实现可以使用它来支持将流量转发到自定义目标，例如存储桶。重要的是，api的每个实现都清楚地定义了支持的目标类型，并且对于一种类型映射到哪个资源没有歧义。这是因为每个Ingress实现都有一个硬编码的类型到资源的映射。
+
+如果使用“kind”而不是“resource”，上面的对象引用将如下所示：
+
+```
+fooRef:
+    group: sns.services.k8s.aws
+    kind: Topic
+    name: foo
+    namespace: foo-namespace
+```
+
+\
+**Controller behavior**
+
+operator可以存储一个（group, resource）到期望的资源版本的映射。从那里，它可以构造资源的完整路径，并检索对象。
+
+也可以让控制器选择通过发现客户端找到的版本。但是，由于结构（schema）可能因资源的不同版本而异，控制器也必须处理这些差异。
+
+\
+**Generic object reference**
+
+当希望提供指向某个对象的指针以简化用户发现时，使用通用对象引用。例如，这可用于引用`core.v1.Event`对象。
+
+使用通用对象引用，除了标准（例如ObjectMeta）之外，无法提取有关引用对象的任何信息。由于资源的任何版本中都存在任何标准字段，因此在这种情况下可以不包括版本：
+
+```
+fooObjectRef:
+    group: operator.openshift.io
+    resource: openshiftapiservers
+    name: cluster
+    # namespace is unset if the resource is cluster-scoped, or lives in the
+    # same namespace as the referrer.
+```
+
+\
+**Controller behavior**
+
+oeperator应期望使用复现客户端（由于未提供版本）来找到该资源。由于任何可检索字段对所有对象都是通用的，因此任何版本的资源都应该这样做。
+
+\
+**Field reference**
+
+当期望从引用的对象获取字段值的时候使用字段引用。
+
+字段引用和其他引用类型不同，因为operator在在引用前不知道该对象的信息。由于对象的结构（schema）在资源的不同版本之间可能会不同，这意味着对于字段引用需要一个“版本”说明。
+
+```
+fooFieldRef:
+   version: v1 # version of the resource
+   # group is elided in the ConfigMap example, since it has a blank group in the OpenAPI spec.
+   resource: configmaps
+   fieldPath: data.foo
+```
+
+fieldPath应该指向一个单一的值，并使用[推荐的字段选择器符号](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#selecting-fields)表示字段路径（path）。
+
+\
+**Controller behavior**
+
+在这种情况下，用户将提供所有必需的路径元素：组、版本、资源、名称和可能的命名空间。因此，控制器可以构造api前缀并在不使用发现客户端的情况下对其进行查询：
+
+```
+/apis/{group}/{version}/{resource}/
+```
+
+\
+
+
+\
 \
