@@ -41,6 +41,9 @@
   * [4.12 statefulset controller分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.12-statefulset-controller-fen-xi.md)
   * [4.13 daemonset controller源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.13-daemonset-controller-yuan-ma-fen-xi.md)
   * [4.16 k8s GC](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.16-k8s-gc.md)
+* [第五章： apimachinery](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/README.md)
+  * [5.1 什么是 apimachinery](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.1-shen-me-shi-apimachinery.md)
+* [api-conventions](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/api-conventions.md)
 * [认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
 
