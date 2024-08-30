@@ -30,7 +30,7 @@ CRD 有点类似于在数据库中定义的表结构，而 CR 则是基于 CRD �
 
 Kubernetes 本身就自带了一堆 Controller，Master 节点上的三大核心组件之一：Controller Manager，其实就是一堆 Controller 的集合
 
-<figure><img src="../../.gitbook/assets/image (32).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (18).png" alt=""><figcaption></figcaption></figure>
 
 声明式 API[ ](https://kubernetes.io/zh-cn/docs/concepts/extend-kubernetes/api-extension/custom-resources/#declarative-apis) vs  命令式 API\
 
@@ -74,7 +74,7 @@ CRD 允许用户创建新的资源类别同时又不必添加新的 API 服务�
 
 ## Operator 诞生的背景 <a href="#operator-dan-sheng-de-bei-jing" id="operator-dan-sheng-de-bei-jing"></a>
 
-<figure><img src="../../.gitbook/assets/image (27).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (13).png" alt=""><figcaption></figcaption></figure>
 
 kubernetes 无法做到真正意义的开箱即用的，它与传统的 PaaS 平台不同，它仅仅只提供核心的基础设施功能，但是还无法满足用户的最终需求，这里用户主要指业务开发和业务运维， 比如说业务开发需要 CI/CD 工具实现 Devops 的功能，原生 kubernetes 是不提供支持的，但是我们可以通过`tekton`这一个第三方工具实现 DevOps 相关功能， 这也正是 kubernetes 区别传统PaaS平台的真正强大之处，其提供完善的扩展机制以及基于此而发展出来的海量的第三方工具和丰富的生态。
 
@@ -86,7 +86,7 @@ kubernetes 无法做到真正意义的开箱即用的，它与传统的 PaaS 平
 
 随着 kubernetes 的功能越来越复杂，其需要管理的资源在高速增长，对应的 API 和 controller 的数量也愈发无法控制， kubernetes 变得很臃肿，很多不必要的 API 和功能将出现在每次安装的集群中。
 
-<figure><img src="../../.gitbook/assets/image (28).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
 
 为了解决这个问题，CRD 应运而生，CRD 由 TPR(Third Part Resource v1.2 版本引入)演化而来，v1.7 进入 beta，v1.8 进入稳定， 通过 CRD，kubernetes 可以动态的添加并管理资源。CRD 解决了结构化数据存储的问题，Controller 则用来跟踪这些资源， 保证资源的状态满足期望值。`CRD+Controller=decalartive API`，声明式 API 设计是 kubernetes 重要的设计思想， 该设计保证能够动态扩展 kubernetes API，这种模式也正是 Operator pattern。
 
@@ -126,7 +126,7 @@ CRD+custom controller 已经被广泛地使用，按使用场景可划分为以�
 \
 其中步骤 2，5 是核心业务逻辑，其余步骤完全可以通过自动生成的方式省略，到目前，社区有两个成熟的脚手架工具用于简化开发，一个是有 kube-sig 维护的 kubebuilder, 另一个是由 redhat 维护的 operator-sdk，这两个工具都是基于 controller-runtime 项目而实现，用户可自行选择，笔者用的是 kubebuilder。 使用 kubebuilder 能够帮助我们节省以下工作：
 
-<figure><img src="../../.gitbook/assets/image (29).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (15).png" alt=""><figcaption></figcaption></figure>
 
 如果你想要快速构建 CRD 和 Custom controller，脚手架工具是个不错的选择，如果是学习目的，建议结合 sample-controller 和 kubernetes controller 相关 源码。
 
@@ -136,7 +136,7 @@ kubebuilder 是开发自定义控制器的脚手架工具，能给我们搭建�
 
 kubebuilder 是一个帮助开发者快速开发 kubernetes API 的脚手架命令行工具，其依赖库 controller-tools 和 controller-runtime， controller-runtime 简化 kubernetes controller 的开发，并且对 kubernetes 的几个常用库进行了二次封装， 以简化开发者使用。controller-tool 主要功能是代码生成。下图是使用 kubebuilder 的工作流程图：
 
-<figure><img src="../../.gitbook/assets/image (30).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (16).png" alt=""><figcaption></figcaption></figure>
 
 文章后面会结合一个简单示例来介绍开发流程。
 
@@ -260,7 +260,7 @@ func (r *ApplicationReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 kubernetes开箱自带了多个controller，这些controller在我们开发时具有非常重要的参考价值，同时社区也总结了的 controller 开发所需要遵循十一条原则， 但是请大家结合实际场景灵活运用这些原则：
 
-<figure><img src="../../.gitbook/assets/image (31).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (17).png" alt=""><figcaption></figcaption></figure>
 
 ### 总结及展望 <a href="#zong-jie-ji-zhan-wang" id="zong-jie-ji-zhan-wang"></a>
 
