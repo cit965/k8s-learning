@@ -49,6 +49,7 @@
   * [5.7 conditions](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.7-conditions.md)
   * [5.8 event](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.8-event.md)
   * [5.10 多版本和序列化](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.10-duo-ban-ben-he-xu-lie-hua.md)
+* [5.11 Kubernetes API Scheme 解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/5.11-kubernetes-api-scheme-jie-xi.md)
 * [认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
 
