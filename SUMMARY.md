@@ -56,3 +56,8 @@
 ## 开发者要懂的 k8s
 
 * [1 在 k8s 上部署应用](kai-fa-zhe-yao-dong-de-k8s/1-zai-k8s-shang-bu-shu-ying-yong.md)
+
+## Group 1
+
+* [k8s 源码每日新闻](group-1/k8s-yuan-ma-mei-ri-xin-wen.md)
+* [2024-9-13](group-1/2024-9-13.md)
