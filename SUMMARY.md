@@ -8,7 +8,7 @@
 * [第零章 ：阅读源码必知必会](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/README.md)
   * [01-调试开发k8s](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/01-tiao-shi-kai-fa-k8s.md)
   * [02- 当你运行 kubectl create deployment 命令时发生了什么](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/02-dang-ni-yun-xing-kubectl-create-deployment-ming-ling-shi-fa-sheng-le-shen-me.md)
-* [第一章：client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/README.md)
+* [第一章： client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/README.md)
   * [01-client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/01-client-go.md)
   * [02-Informer](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/02-informer.md)
   * [03-写一个控制器](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/03-xie-yi-ge-kong-zhi-qi.md)
@@ -51,7 +51,11 @@
   * [5.10 多版本和序列化](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.10-duo-ban-ben-he-xu-lie-hua.md)
   * [5.11 Scheme 解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.11-scheme-jie-xi.md)
   * [5.12 k8s api-changes（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.12-k8s-apichanges-fan-yi.md)
-* [认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
+* [第六章： kubelet 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi.md)
+* [第七章： kubeproxy 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-qi-zhang-kubeproxy-yuan-ma-fen-xi.md)
+* [第八章： kubectl 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-ba-zhang-kubectl-yuan-ma-fen-xi.md)
+* [第九章： cloud-controller-manager 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-jiu-zhang-cloudcontrollermanager-yuan-ma-fen-xi.md)
+* [第十章： 认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
 
 ## 开发者要懂的 k8s
