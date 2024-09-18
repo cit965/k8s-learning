@@ -51,7 +51,7 @@
   * [5.10 多版本和序列化](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.10-duo-ban-ben-he-xu-lie-hua.md)
   * [5.11 Scheme 解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.11-scheme-jie-xi.md)
   * [5.12 k8s api-changes（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.12-k8s-apichanges-fan-yi.md)
-* [5.13 k8s API Codec 解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/5.13-k8s-api-codec-jie-xi.md)
+  * [5.13 k8s API Codec 解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.13-k8s-api-codec-jie-xi.md)
 * [第六章： kubelet 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi.md)
 * [第七章： kubeproxy 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-qi-zhang-kubeproxy-yuan-ma-fen-xi.md)
 * [第八章： kubectl 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-ba-zhang-kubectl-yuan-ma-fen-xi.md)
