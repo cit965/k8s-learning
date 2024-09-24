@@ -53,7 +53,7 @@
   * [5.12 k8s api-changes（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.12-k8s-apichanges-fan-yi.md)
   * [5.13 序列化器与序列化器工厂](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.13-xu-lie-hua-qi-yu-xu-lie-hua-qi-gong-chang.md)
   * [5.14 序列化器与序列化工厂2](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.14-xu-lie-hua-qi-yu-xu-lie-hua-gong-chang-2.md)
-  * [5.14 序列化器与序列化器工厂2](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.14-xu-lie-hua-qi-yu-xu-lie-hua-qi-gong-chang-2.md)
+  * [5.14 序列化器与序列化器工厂3](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.14-xu-lie-hua-qi-yu-xu-lie-hua-qi-gong-chang-3.md)
   * [5.15 apimachinery在 client-go中的使用](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.15-apimachinery-zai-clientgo-zhong-de-shi-yong.md)
   * [5.16 apimachery 其他模块](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.16-apimachery-qi-ta-mo-kuai.md)
   * [5.16 apiserver 源码分析 01](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.16-apiserver-yuan-ma-fen-xi-01.md)
