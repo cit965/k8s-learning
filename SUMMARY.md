@@ -54,6 +54,7 @@
   * [5.13 序列化器与序列化器工厂](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.13-xu-lie-hua-qi-yu-xu-lie-hua-qi-gong-chang.md)
   * [5.14 序列化器与序列化器工厂2](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.14-xu-lie-hua-qi-yu-xu-lie-hua-qi-gong-chang-2.md)
   * [5.15 apimachinery在 client-go中的使用](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.15-apimachinery-zai-clientgo-zhong-de-shi-yong.md)
+  * [5.16 apimachery 其他模块](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.16-apimachery-qi-ta-mo-kuai.md)
   * [5.16 apiserver 源码分析 01](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.16-apiserver-yuan-ma-fen-xi-01.md)
 * [第六章： kubelet 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi.md)
 * [第七章： kubeproxy 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-qi-zhang-kubeproxy-yuan-ma-fen-xi.md)
@@ -61,6 +62,8 @@
 * [第九章： cloud-controller-manager 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-jiu-zhang-cloudcontrollermanager-yuan-ma-fen-xi.md)
 * [第十章： 认证授权](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/README.md)
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
+* [第十一章：gpu](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-shi-yi-zhang-gpu/README.md)
+  * [在 k8s 上安装 gpu](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-shi-yi-zhang-gpu/zai-k8s-shang-an-zhuang-gpu.md)
 
 ## 开发者要懂的 k8s
 
