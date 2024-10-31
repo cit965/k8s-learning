@@ -79,3 +79,4 @@
 ## CICD
 
 * [01、安装jenkins](cicd/01-an-zhuang-jenkins.md)
+* [02、创建你的第一条pipeline](cicd/02-chuang-jian-ni-de-di-yi-tiao-pipeline.md)
