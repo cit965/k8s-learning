@@ -81,3 +81,4 @@
 * [01、安装jenkins](cicd/01-an-zhuang-jenkins.md)
 * [02、创建你的第一条pipeline](cicd/02-chuang-jian-ni-de-di-yi-tiao-pipeline.md)
 * [03、pipeline 入门](cicd/03pipeline-ru-men.md)
+* [04、使用 jenkinsfile](cicd/04-shi-yong-jenkinsfile.md)
