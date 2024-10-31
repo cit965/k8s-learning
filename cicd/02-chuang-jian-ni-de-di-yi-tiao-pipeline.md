@@ -26,7 +26,7 @@ Jenkins Pipeline 提供了一组可扩展的工具，用于将简单到复杂的
 
 <figure><img src="../.gitbook/assets/1730356152314.png" alt=""><figcaption></figcaption></figure>
 
-下面是一些各种语言的简单示例：![](../.gitbook/assets/1730356802895.png)
+下面是一些各种语言的简单示例，笔者比较熟悉go，所以我配置了go 语言的流水线任务。
 
 ### java
 
@@ -76,6 +76,25 @@ pipeline {
 
 ## 运行流水线
 
-当你配置完流水线，返回主页会发现多了个任务：
+当配置完流水线，返回主页会发现多了个任务,点击绿色箭头即可执行：
 
 <figure><img src="../.gitbook/assets/1730356897234.png" alt=""><figcaption></figcaption></figure>
+
+想要查看执行日志的话可以点击具体的流水线任务，点击Console Output:
+
+<figure><img src="../.gitbook/assets/1730357788000.png" alt=""><figcaption></figcaption></figure>
+
+如图，任务执行失败，访问 docker 镜像仓库的时候有问题，这个是因为 GFW 的原因，你可以替换国内镜像仓库，也可以执行更加简单的流水线任务：
+
+```
+pipeline {
+    agent any 
+    stages {
+        stage('Stage 1') {
+            steps {
+                echo 'Hello world!' 
+            }
+        }
+    }
+}
+```
