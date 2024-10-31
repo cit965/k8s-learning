@@ -82,3 +82,4 @@
 * [02、创建你的第一条pipeline](cicd/02-chuang-jian-ni-de-di-yi-tiao-pipeline.md)
 * [03、pipeline 入门](cicd/03pipeline-ru-men.md)
 * [04、使用 jenkinsfile](cicd/04-shi-yong-jenkinsfile.md)
+* [05、如何为您的 Golang 应用程序设置 Jenkins CI/CD 管道](cicd/05-ru-he-wei-nin-de-golang-ying-yong-cheng-xu-she-zhi-jenkins-cicd-guan-dao.md)
