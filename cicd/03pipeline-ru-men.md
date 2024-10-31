@@ -4,15 +4,9 @@
 
 * [通过 Blue Ocean](https://www.jenkins.io/zh/doc/book/pipeline/getting-started/#through-blue-ocean) - 在 Blue Ocean 中设置一个流水线项目后，Blue Ocean UI 会帮你编写流水线的 `Jenkinsfile` 文件并提交到源代码管理系统。
 * [通过经典 UI](https://www.jenkins.io/zh/doc/book/pipeline/getting-started/#through-the-classic-ui) - 你可以通过经典 UI 在 Jenkins 中直接输入基本的流水线。
-* [在源码管理系统中定义](https://www.jenkins.io/zh/doc/book/pipeline/getting-started/#defining-a-pipeline-in-scm) - 你可以手动编写一个 `Jenkinsfile` 文件，然后提交到项目的源代码管理仓库中。
+* [在代码仓库中定义](https://www.jenkins.io/zh/doc/book/pipeline/getting-started/#defining-a-pipeline-in-scm) - 你可以手动编写一个 `Jenkinsfile` 文件，然后提交到项目的源代码仓库中。
 
-使用两种方式定义流水线的语法是相同的。尽管 Jenkins 支持在经典 UI 中直接进入流水线，但通常认为最好的实践是在 `Jenkinsfile` 文件中定义流水线，Jenkins 之后会直接从源代码管理系统加载。
-
-### 通过 Blue Ocean
-
-如果你刚接触 Jenkins 流水线，Blue Ocean UI 可以帮助你 [设置流水线项目](https://www.jenkins.io/zh/doc/book/blueocean/creating-pipelines)，并通过图形化流水线编辑器为你自动创建和编写流水线（即 `Jenkinsfile`）。
-
-作为在 Blue Ocean 中设置流水线项目的一部分，Jenkins 给你项目的源代码管理仓库配置了一个安全的、经过身份验证的适当的连接。因此，你通过 Blue Ocean 的流水线编辑器在 `Jenkinsfile` 中做的任何更改都会自动的保存并提交到源代码管理系统。
+尽管 Jenkins 支持在经典 UI 中直接进入流水线，但通常认为最好的实践是在 `Jenkinsfile` 文件中定义流水线，Jenkins 之后会直接从源代码管理系统加载。
 
 ### 通过经典 UI
 
@@ -77,4 +71,10 @@
    **Tip:** 如果你不确定给定字段应填写什么值，点击它右侧的 **?** 图标以获取更多信息。
 5. 在 **脚本路径** 字段，指定你的 `Jenkinsfile` 文件的位置（和名称）。这个位置是 Jenkins 检出/克隆包括 `Jenkinsfile` 文件的仓库的位置，它应该与仓库的文件结构匹配。该字段的默认值采取名称为 "Jenkinsfile" 的 `Jenkinsfile` 文件并位于仓库的根路径。
 
-当你更新指定的仓库时，只要流水线配置了版本管理系统的轮询触发器，就会触发一个新的构建。![](broken-reference)
+当你更新指定的仓库时，只要流水线配置了版本管理系统的轮询触发器，就会触发一个新的构建。
+
+### 通过 Blue Ocean
+
+如果你刚接触 Jenkins 流水线，Blue Ocean UI 可以帮助你 [设置流水线项目](https://www.jenkins.io/zh/doc/book/blueocean/creating-pipelines)，并通过图形化流水线编辑器为你自动创建和编写流水线（即 `Jenkinsfile`）。
+
+作为在 Blue Ocean 中设置流水线项目的一部分，Jenkins 给你项目的源代码管理仓库配置了一个安全的、经过身份验证的适当的连接。因此，你通过 Blue Ocean 的流水线编辑器在 `Jenkinsfile` 中做的任何更改都会自动的保存并提交到源代码管理系统。
