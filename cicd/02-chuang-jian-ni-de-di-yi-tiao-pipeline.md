@@ -22,7 +22,11 @@ Jenkins Pipeline 提供了一组可扩展的工具，用于将简单到复杂的
 
 <figure><img src="../.gitbook/assets/2ef7a480c6d24d0e0acdcace101c7d8.png" alt=""><figcaption></figcaption></figure>
 
-下面是一些易于复制和粘贴的具有各种语言的简单管道的示例。
+<figure><img src="../.gitbook/assets/6157b3f518a98652e14ae0e8d909fb8.png" alt=""><figcaption></figcaption></figure>
+
+<figure><img src="../.gitbook/assets/1730356152314.png" alt=""><figcaption></figcaption></figure>
+
+下面是一些各种语言的简单示例：![](../.gitbook/assets/1730356802895.png)
 
 ### java
 
@@ -70,4 +74,8 @@ pipeline {
 }
 ```
 
-我们
+## 运行流水线
+
+当你配置完流水线，返回主页会发现多了个任务：
+
+<figure><img src="../.gitbook/assets/1730356897234.png" alt=""><figcaption></figcaption></figure>
