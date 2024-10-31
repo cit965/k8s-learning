@@ -69,8 +69,13 @@
 ## 开发者要懂的 k8s
 
 * [1 在 k8s 上部署应用](kai-fa-zhe-yao-dong-de-k8s/1-zai-k8s-shang-bu-shu-ying-yong.md)
+* [Page](kai-fa-zhe-yao-dong-de-k8s/page.md)
 
 ## k8s源码每日新闻
 
 * [2024-9-13](k8s-yuan-ma-mei-ri-xin-wen/2024-9-13.md)
 * [2024-9-14](k8s-yuan-ma-mei-ri-xin-wen/2024-9-14.md)
+
+## CICD
+
+* [01、安装jenkins](cicd/01-an-zhuang-jenkins.md)
