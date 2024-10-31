@@ -83,7 +83,7 @@ sudo docker exec ${CONTAINER_ID or CONTAINER_NAME} cat /var/jenkins_home/secrets
 
 <figure><img src="../.gitbook/assets/1730336100806.png" alt=""><figcaption></figcaption></figure>
 
-插件安装完成后会要求我们创建一个管理员账号，数据账号密码邮箱即可：
+插件安装完成后会要求我们创建一个管理员账号，输入账号密码邮箱即可：
 
 <figure><img src="../.gitbook/assets/1730336283030.png" alt=""><figcaption></figcaption></figure>
 
