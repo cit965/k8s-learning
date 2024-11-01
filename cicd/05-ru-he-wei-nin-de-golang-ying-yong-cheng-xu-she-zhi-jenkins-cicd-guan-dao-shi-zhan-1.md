@@ -2,15 +2,13 @@
 
 ![Jenkins CI/CD pipeline](https://mattermost.com/wp-content/uploads/2022/04/04\_Jenkins\_CI\_CD@2x.webp)
 
-
-
-Jenkins 是我们可以用来设置 CI/CD 的工具。它是用 Java 编写的，并且完全开源。首先，您需要在系统上安装 Jenkins。前往[Jenkins 官方页面](https://www.jenkins.io/doc/book/installing/)执行此操作。
-
 在开始之前，本指南中的所有示例均基于[此 GitHub 存储库](https://github.com/shadowshot-x/micro-product-go/tree/Testing-CICD)中找到的代码。
 
 ### 设置 Docker 和 Golang&#x20;
 
-你需要安装 golang，docker  插件，这让 Jenkins 节点知道 Docker 和 Golang 在插件中可用。
+你需要先安装 golang，docker  插件，这让 Jenkins 节点知道 Docker 和 Golang 在插件中可用。
+
+<figure><img src="../.gitbook/assets/2b04b6b18327a9e9e5cccbe102842f4.png" alt=""><figcaption></figcaption></figure>
 
 ![installing plugins/upgrades](https://mattermost.com/wp-content/uploads/2022/04/image2-1-1024x446.webp)
 
