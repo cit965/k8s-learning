@@ -2,17 +2,26 @@
 
 ## 介绍
 
-Jenkins 是一个独立的开源自动化服务器，可用于自动化与构建、测试、交付或部署软件相关的各种任务。
-
 jenkins 是最老牌功能最全的devops平台，适合市面上99%的场景，如果你刚接触 devops，那么从jenkins出发是个不错的选择。
 
-jeinkins 可以通过本机系统包、Docker 安装，甚至可以在任何安装了 Java 运行时环境 (JRE) 的机器上独立运行。
+无论您是开发人员、DevOps 工程师还是 IT 专业人员，掌握 Jenkins 都可以彻底改变您构建、测试和部署应用程序的方式。在本 Jenkins 教程中，我们将从基础知识开始，解释 Jenkins 是什么以及它是如何工作的。我们将指导您设置 Jenkins、创建您的第一个 Pipeline，并探索其强大的持续集成和持续交付 (CI/CD) 功能。最后，您将掌握如何自动执行重复任务、缩短开发周期和维护高质量软件的能力。
+
+## 为什么选择 jenkins
+
+* **掌握 CI/CD 管道：**高效地自动构建、测试和部署代码。
+* **自动执行重复任务：**节省时间并减少软件开发中的人为错误。
+* **广泛的工具集成：**可与 Git、Maven、Docker 和 Kubernetes 等众多工具配合使用。
+* **促进团队协作：**促进持续集成和反馈，改善团队工作流程。
+* **可扩展性：**支持具有分布式构建的大型项目。
+* **职业发展：**对 Jenkins 专业知识的高需求带来了更好的工作机会。
 
 ## 安装
 
-使用 docker 安装对于新手比价友好，也是官方推荐的第一种安装方式，我们打开官网安装文档：[https://www.jenkins.io/doc/book/installing/docker/](https://www.jenkins.io/doc/book/installing/docker/)&#x20;
+Jenkins 是使用 Java 编程语言开发的，在您需要安装 Jenkins 之前，您需要在要安装 Jenkins 的系统上安装 Java。Jenkins 支持在 linux 、windows、macos 上运行。
 
-### prerequisites
+由于 Jenkins 官方也提供了 Docker 安装文档版，这种安装方式更加简单，所以本节教程我们使用 Docker 来安装，打开官网安装文档：[https://www.jenkins.io/doc/book/installing/docker/](https://www.jenkins.io/doc/book/installing/docker/)&#x20;
+
+### 软件运行所需资源
 
 * &#x20;256 MB 内存
 * 1 GB 磁盘空间
@@ -91,6 +100,6 @@ sudo docker exec ${CONTAINER_ID or CONTAINER_NAME} cat /var/jenkins_home/secrets
 
 <figure><img src="../.gitbook/assets/1730336463931.png" alt=""><figcaption></figcaption></figure>
 
-到此，jenkins 已经安装完毕，下面就是熟悉 jenkins 的各种功能了：
+到此 Jenkins 已经安装完毕，下面可以正式开始我们的 jenkins 学习之旅了！
 
 <figure><img src="../.gitbook/assets/1730336519268.png" alt=""><figcaption></figcaption></figure>
