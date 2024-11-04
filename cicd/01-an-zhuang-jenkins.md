@@ -1,4 +1,4 @@
-# 01、安装jenkins
+# 01、安装 jenkins
 
 ## 介绍
 
@@ -19,7 +19,7 @@ jenkins 是最老牌功能最全的devops平台，适合市面上99%的场景，
 
 Jenkins 是使用 Java 编程语言开发的，在您需要安装 Jenkins 之前，您需要在要安装 Jenkins 的系统上安装 Java。Jenkins 支持在 linux 、windows、macos 上运行。
 
-由于 Jenkins 官方也提供了 Docker 安装文档版，这种安装方式更加简单，所以本节教程我们使用 Docker 来安装，打开官网安装文档：[https://www.jenkins.io/doc/book/installing/docker/](https://www.jenkins.io/doc/book/installing/docker/)&#x20;
+由于 Jenkins 官方也提供了 Docker 安装文档版，这种安装方式更加简单，所以本节教程我们使用 Docker 来安装，打开官网安装文档：[https://www.jenkins.io/doc/book/installing/docker/](https://www.jenkins.io/doc/book/installing/docker/) ，按照官方安装说明安装即可。
 
 ### 软件运行所需资源
 
