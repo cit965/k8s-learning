@@ -87,5 +87,5 @@
 
 ## c# 编程入门
 
-* [c# 之旅](c-bian-cheng-ru-men/c-zhi-l.md)
-* [01、VScode编辑器上编译C#](c-bian-cheng-ru-men/01vscode-bian-ji-qi-shang-bian-yi-c.md)
+* [01、c# 之旅](c-bian-cheng-ru-men/01c-zhi-l.md)
+* [02、VScode编辑器上编译C#](c-bian-cheng-ru-men/02vscode-bian-ji-qi-shang-bian-yi-c.md)
