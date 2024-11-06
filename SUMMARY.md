@@ -84,3 +84,7 @@
 * [04、使用 jenkinsfile](cicd/04-shi-yong-jenkinsfile.md)
 * [05、Jenkins CI/CD 管道实战1 【go-k8s】](cicd/05jenkins-cicd-guan-dao-shi-zhan-1-gok8s.md)
 * [06、 Jenkins CI/CD 管道实战2 【go-主机】](cicd/06-jenkins-cicd-guan-dao-shi-zhan-2-go-zhu-ji.md)
+
+## c# 编程入门
+
+* [01、VScode编辑器上编译C#](c-bian-cheng-ru-men/01vscode-bian-ji-qi-shang-bian-yi-c.md)
