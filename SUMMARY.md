@@ -89,3 +89,7 @@
 
 * [01、c# 之旅](c-bian-cheng-ru-men/01c-zhi-l.md)
 * [02、VScode编辑器上编译C#](c-bian-cheng-ru-men/02vscode-bian-ji-qi-shang-bian-yi-c.md)
+
+## python 从入门到放弃
+
+* [python 教程](python-cong-ru-men-dao-fang-qi/python-jiao-cheng.md)
