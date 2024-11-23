@@ -75,16 +75,6 @@
 * [2024-9-13](k8s-yuan-ma-mei-ri-xin-wen/2024-9-13.md)
 * [2024-9-14](k8s-yuan-ma-mei-ri-xin-wen/2024-9-14.md)
 
-***
-
-* [helm 教程](helm-jiao-cheng/README.md)
-  * [01-快速入门](helm-jiao-cheng/01.md)
-  * [02-如何使用](helm-jiao-cheng/02.md)
-  * [03-制作chart](helm-jiao-cheng/03.md)
-  * [04-chart学习](helm-jiao-cheng/04.md)
-  * [05-chart hook](helm-jiao-cheng/05.md)
-  * [06-chart 指南](helm-jiao-cheng/06.md)
-
 ## jenkins 教程
 
 * [01、安装 jenkins](jenkins-jiao-cheng/01-an-zhuang-jenkins.md)
@@ -93,6 +83,13 @@
 * [04、使用 jenkinsfile](jenkins-jiao-cheng/04-shi-yong-jenkinsfile.md)
 * [05、Jenkins CI/CD 管道实战1 【go-k8s】](jenkins-jiao-cheng/05jenkins-cicd-guan-dao-shi-zhan-1-gok8s.md)
 * [06、 Jenkins CI/CD 管道实战2 【go-主机】](jenkins-jiao-cheng/06-jenkins-cicd-guan-dao-shi-zhan-2-go-zhu-ji.md)
+* [helm 教程](jenkins-jiao-cheng/helm-jiao-cheng/README.md)
+  * [01-快速入门](jenkins-jiao-cheng/helm-jiao-cheng/01.md)
+  * [02-如何使用](jenkins-jiao-cheng/helm-jiao-cheng/02.md)
+  * [03-制作chart](jenkins-jiao-cheng/helm-jiao-cheng/03.md)
+  * [04-chart学习](jenkins-jiao-cheng/helm-jiao-cheng/04.md)
+  * [05-chart hook](jenkins-jiao-cheng/helm-jiao-cheng/05.md)
+  * [06-chart 指南](jenkins-jiao-cheng/helm-jiao-cheng/06.md)
 
 ## c# 编程入门
 
