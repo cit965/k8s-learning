@@ -76,14 +76,18 @@
 * [2024-9-13](k8s-yuan-ma-mei-ri-xin-wen/2024-9-13.md)
 * [2024-9-14](k8s-yuan-ma-mei-ri-xin-wen/2024-9-14.md)
 
-## CICD
+***
 
-* [01、安装 jenkins](cicd/01-an-zhuang-jenkins.md)
-* [02、创建你的第一条pipeline](cicd/02-chuang-jian-ni-de-di-yi-tiao-pipeline.md)
-* [03、pipeline 入门](cicd/03pipeline-ru-men.md)
-* [04、使用 jenkinsfile](cicd/04-shi-yong-jenkinsfile.md)
-* [05、Jenkins CI/CD 管道实战1 【go-k8s】](cicd/05jenkins-cicd-guan-dao-shi-zhan-1-gok8s.md)
-* [06、 Jenkins CI/CD 管道实战2 【go-主机】](cicd/06-jenkins-cicd-guan-dao-shi-zhan-2-go-zhu-ji.md)
+* [helm 教程](helm-jiao-cheng.md)
+
+## jenkins 教程
+
+* [01、安装 jenkins](jenkins-jiao-cheng/01-an-zhuang-jenkins.md)
+* [02、创建你的第一条pipeline](jenkins-jiao-cheng/02-chuang-jian-ni-de-di-yi-tiao-pipeline.md)
+* [03、pipeline 入门](jenkins-jiao-cheng/03pipeline-ru-men.md)
+* [04、使用 jenkinsfile](jenkins-jiao-cheng/04-shi-yong-jenkinsfile.md)
+* [05、Jenkins CI/CD 管道实战1 【go-k8s】](jenkins-jiao-cheng/05jenkins-cicd-guan-dao-shi-zhan-1-gok8s.md)
+* [06、 Jenkins CI/CD 管道实战2 【go-主机】](jenkins-jiao-cheng/06-jenkins-cicd-guan-dao-shi-zhan-2-go-zhu-ji.md)
 
 ## c# 编程入门
 

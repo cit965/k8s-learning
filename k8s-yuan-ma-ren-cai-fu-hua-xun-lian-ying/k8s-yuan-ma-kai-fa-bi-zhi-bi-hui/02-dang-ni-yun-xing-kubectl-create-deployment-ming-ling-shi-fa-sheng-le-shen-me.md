@@ -92,7 +92,7 @@ Kubectl 还将确定是否需要触发其他操作，例如记录命令（用于
 
 由于 kube-apiserver 在 `/apis` 路径中暴露其 OpenAPI 格式的 scheme 文档，因此客户端可以轻松的找到匹配的 API。
 
-为了提高性能， Kubectl 还将 [OpenAPI scheme 缓存到 `~/.kube/cache/discovery` 目录](https://github.com/kubernetes/kubernetes/blob/v1.14.0/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config\_flags.go#L234)。如果要了解 API 发现的完整过程，你可以尝试删除该目录并在运行 Kubectl 命令时将 `-v` 参数的值设为最大，然后你将会在日志中看到所有试图找到这些 API 版本的 HTTP 请求。
+为了提高性能， Kubectl 还将 [OpenAPI scheme 缓存到 `~/.kube/cache/discovery` 目录](https://github.com/kubernetes/kubernetes/blob/v1.14.0/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#L234)。如果要了解 API 发现的完整过程，你可以尝试删除该目录并在运行 Kubectl 命令时将 `-v` 参数的值设为最大，然后你将会在日志中看到所有试图找到这些 API 版本的 HTTP 请求。
 
 最后一步才是真正地[发送 HTTP 请求](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L709)。一旦请求获得成功的响应， Kubectl 将会根据所需的[输出格式](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L459)打印 success message。
 
@@ -111,8 +111,8 @@ Kubectl 还将确定是否需要触发其他操作，例如记录命令（用于
 一旦有了上述信息， Kubectl 就会填充客户端的配置，以便它能够适当地修饰 HTTP 请求：
 
 * x509 证书使用 [`tls.TLSConfig`](https://github.com/kubernetes/client-go/blob/kubernetes-1.14.0/rest/transport.go#L80-L89) 发送（包括 CA 证书）；
-* bearer tokens 在 HTTP 请求头 Authorization 中[发送](https://github.com/kubernetes/client-go/blob/kubernetes-1.14.0/transport/round\_trippers.go#L316)；
-* 用户名和密码通过 HTTP 基础认证[发送](https://github.com/kubernetes/client-go/blob/kubernetes-1.14.0/transport/round\_trippers.go#L197)；
+* bearer tokens 在 HTTP 请求头 Authorization 中[发送](https://github.com/kubernetes/client-go/blob/kubernetes-1.14.0/transport/round_trippers.go#L316)；
+* 用户名和密码通过 HTTP 基础认证[发送](https://github.com/kubernetes/client-go/blob/kubernetes-1.14.0/transport/round_trippers.go#L197)；
 * OpenID 认证过程是由用户事先手动处理的，产生一个像 bearer token 一样被发送的 token。
 
 ### kube-apiserver
@@ -155,7 +155,7 @@ Kubernetes v1.14 的 authorizer 实例：
 * [webhook](https://github.com/kubernetes/apiserver/blob/kubernetes-1.14.0/plugin/pkg/authorizer/webhook/webhook.go#L152)：与集群外的 HTTP(S) 服务交互；
 * [ABAC](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/auth/authorizer/abac/abac.go#L224)：执行静态文件中定义的策略；
 * [RBAC](https://github.com/kubernetes/kubernetes/blob/v1.14.0/plugin/pkg/auth/authorizer/rbac/rbac.go#L74)：执行由集群管理员添加为 k8s 资源的 RBAC 规则；
-* [Node](https://github.com/kubernetes/kubernetes/blob/v1.14.0/plugin/pkg/auth/authorizer/node/node\_authorizer.go#L80)：确保 kubelet 只能访问自己节点上的资源。
+* [Node](https://github.com/kubernetes/kubernetes/blob/v1.14.0/plugin/pkg/auth/authorizer/node/node_authorizer.go#L80)：确保 kubelet 只能访问自己节点上的资源。
 
 #### Admission Controller
 
@@ -167,7 +167,7 @@ Kubernetes v1.14 的 authorizer 实例：
 
 Admission Controller 的工作方式类似于 Authentication 和 Authorization 的工作方式，但有一个区别：如果单个 Admission Controller 失败，整个链断开，请求将失败。
 
-Admission Controller 设计的真正优势在于它致力于提升_可扩展性_。每个控制器都作为插件存储在 [plugin/pkg/admission](https://github.com/kubernetes/kubernetes/tree/v1.14.0/plugin/pkg/admission) 目录中，最后编译进 kube-apiserver 二进制文件。
+Admission Controller 设计的真正优势在于它致力于提&#x5347;_&#x53EF;扩展性_。每个控制器都作为插件存储在 [plugin/pkg/admission](https://github.com/kubernetes/kubernetes/tree/v1.14.0/plugin/pkg/admission) 目录中，最后编译进 kube-apiserver 二进制文件。
 
 Kubernetes 目前提供十多种 Admission Controller，此处建议阅读文档 [Kubernetes Admission Controller](https://v1-14.docs.kubernetes.io/docs/reference/access-authn-authz/admission-controllers/)。
 
@@ -211,11 +211,11 @@ Kubernetes 系统中使用了大量的 Controller， Controller 是一个用于�
 
 首先，我们介绍一下 Deployment Controller：
 
-将 Deployment 存储到 etcd 后，我们通过 kube-apiserver 可以看到它。当这个新资源可用时， Deployment Controller 会检测到它，它的工作是监听 Deployment 的更改。在我们的例子中， Controller 通过[注册创建事件的回调函数](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/deployment\_controller.go#L122)（更多相关信息，参见下文）。
+将 Deployment 存储到 etcd 后，我们通过 kube-apiserver 可以看到它。当这个新资源可用时， Deployment Controller 会检测到它，它的工作是监听 Deployment 的更改。在我们的例子中， Controller 通过[注册创建事件的回调函数](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/deployment_controller.go#L122)（更多相关信息，参见下文）。
 
-当我们的 Deployment 首次可用时，将执行此回调函数，并[将该对象添加到内部工作队列（internal work queue）](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/deployment\_controller.go#L166-L170)。
+当我们的 Deployment 首次可用时，将执行此回调函数，并[将该对象添加到内部工作队列（internal work queue）](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/deployment_controller.go#L166-L170)。
 
-当它处理我们的 Deployment 对象时，控制器将[检查我们的 Deployment](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/deployment\_controller.go#L571) 并意识到没有与之关联的 ReplicaSet 或 Pod。
+当它处理我们的 Deployment 对象时，控制器将[检查我们的 Deployment](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/deployment_controller.go#L571) 并意识到没有与之关联的 ReplicaSet 或 Pod。
 
 它通过使用标签选择器 (label selectors) 查询 kube-apiserver 来实现此功能。有趣的是，这个同步过程是状态不可知的。另外，它以相同的方式调谐新对象和已存在的对象。
 
@@ -231,9 +231,9 @@ ReplicaSet 的 PodSpec 字段是从 Deployment 的 manifest 以及其他相关�
 
 ReplicaSet Controller 的工作是监视 ReplicaSet 及其相关资源 Pod 的生命周期。与大多数其它控制器一样，它通过触发某些事件的处理程序来实现。
 
-当创建 ReplicaSet 时（由 Deployment Controller 创建），ReplicaSet Controller 会[检查新 ReplicaSet 的状态](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/replicaset/replica\_set.go#L583)，并意识到现有状态与期望状态之间存在偏差。然后，它试图通过[调整 pod 的副本数](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/replicaset/replica\_set.go#L460)来调谐这种状态。
+当创建 ReplicaSet 时（由 Deployment Controller 创建），ReplicaSet Controller 会[检查新 ReplicaSet 的状态](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/replicaset/replica_set.go#L583)，并意识到现有状态与期望状态之间存在偏差。然后，它试图通过[调整 pod 的副本数](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/replicaset/replica_set.go#L460)来调谐这种状态。
 
-Pod 的创建也是[批量](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/replicaset/replica\_set.go#L478-L499))进行的，从数量 `SlowStartInitialBatchSize` 开始，然后在每次成功的迭代中以一种 `slow start` 操作加倍。这样做的目的是在大量 Pod 启动失败时（例如，由于资源配额），可以减轻 kube-apiserver 由于大量不必要的 HTTP 请求导致崩溃的风险。
+Pod 的创建也是[批量](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/replicaset/replica_set.go#L478-L499))进行的，从数量 `SlowStartInitialBatchSize` 开始，然后在每次成功的迭代中以一种 `slow start` 操作加倍。这样做的目的是在大量 Pod 启动失败时（例如，由于资源配额），可以减轻 kube-apiserver 由于大量不必要的 HTTP 请求导致崩溃的风险。
 
 Kubernetes 通过 Owner References （子资源的某个字段中引用其父资源的 ID） 来执行严格的资源对象层级结构。这确保了一旦 Controller 管理的资源被删除（级联删除），子资源就会被垃圾收集器删除，同时还为父资源提供了一种有效的方式来避免他们竞争同一个子资源（想象两对父母认为他们拥有同一个孩子的场景）。
 
@@ -268,8 +268,8 @@ Scheduler 作为一个独立的组件运行在集群控制平面上，工作方�
 
 为了找到合适的节点， Scheduler 会使用特定的算法，默认调度算法工作流程如下：
 
-1. 当 Scheduler 启动时，会注册[一系列默认的预选策略](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/algorithmprovider/defaults/defaults.go#L37)，这些预选策略会[对候选节点进行评估](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/core/generic\_scheduler.go#L184)，判断候选节点是否满足候选 Pod 的需求。例如，如果 PodSpec 显式地限制了 CPU 和内存资源，并且节点的资源容量不满足候选 Pod 的需求时，Pod 就不会被调度到该节点上（资源容量 = 节点资源总量 - 节点中已运行的容器需求资源 （CPU 和内存）总和）；
-2. 一旦选择了适当的节点，就会对剩余的节点运行一系列[优先级函数](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/core/generic\_scheduler.go#L639-L645)，以对候选节点进行打分。例如，为了在整个系统中分散工作负载，它将偏好于资源请求较少的节点（因为这表明运行的工作负载较少）。当它运行这些函数时，它为每个节点分配一个成绩。然后选择分数最高的节点进行调度。
+1. 当 Scheduler 启动时，会注册[一系列默认的预选策略](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/algorithmprovider/defaults/defaults.go#L37)，这些预选策略会[对候选节点进行评估](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/core/generic_scheduler.go#L184)，判断候选节点是否满足候选 Pod 的需求。例如，如果 PodSpec 显式地限制了 CPU 和内存资源，并且节点的资源容量不满足候选 Pod 的需求时，Pod 就不会被调度到该节点上（资源容量 = 节点资源总量 - 节点中已运行的容器需求资源 （CPU 和内存）总和）；
+2. 一旦选择了适当的节点，就会对剩余的节点运行一系列[优先级函数](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/core/generic_scheduler.go#L639-L645)，以对候选节点进行打分。例如，为了在整个系统中分散工作负载，它将偏好于资源请求较少的节点（因为这表明运行的工作负载较少）。当它运行这些函数时，它为每个节点分配一个成绩。然后选择分数最高的节点进行调度。
 
 一旦算法找到了合适的节点， Scheduler 就会[创建一个 Binding 对象](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/scheduler.go#L559-L565)，该对象的 Name 和 Uid 与 Pod 相匹配，并且其 `ObjectReference` 字段包含所选节点的名称，然后通过[发送 POST 请求](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/scheduler/factory/factory.go#L734)给 kube-apiserver。
 
@@ -302,18 +302,18 @@ Scheduler 作为一个独立的组件运行在集群控制平面上，工作方�
 一旦获取到了这个列表，它就会通过与自己的内部缓存进行比较来检测差异，如果有差异，就开始同步 Pod 列表。我们来看看同步过程是什么样的：
 
 1. 如果 Pod 正在创建， Kubelet 就会[暴露一些指标](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet.go#L1504)，可以用于在 Prometheus 中追踪 Pod 启动延时；
-2. 然后，[生成一个 PodStatus 对象](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet\_pods.go#L1333)，表示 Pod 当前阶段的状态。Pod 的 Phase 状态是 Pod 在其生命周期中的高度概括，包括 `Pending`，`Running`，`Succeeded`，`Failed` 和 `Unknown` 这几个值。状态的产生过程非常复杂，因此很有必要深入深挖一下：
-   * 首先，串行执行一系列 `PodSyncHandlers`，每个处理器检查 Pod 是否应该运行在该节点上。当其中之一的处理器认为该 Pod 不应该运行在该节点上，则 Pod 的 Phase 值就会[变成 `PodFailed`](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet\_pods.go#L1340-L1345) 并将从该节点被驱逐。例如，以 Job 为例，当一个 Pod 失败重试的时间超过了 `activeDeadlineSeconds` 设置的值，就会将该 Pod 从该节点驱逐出去；
-   * 接下来，Pod 的 Phase 值由 init 容器和主容器状态共同决定。由于主容器尚未启动，容器被视为处于[等待阶段](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet\_pods.go#L1284)，如果 [Pod 中至少有一个容器处于等待阶段，则其 Phase 值为 `Pending`](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet\_pods.go#L1298-L1301)。
+2. 然后，[生成一个 PodStatus 对象](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet_pods.go#L1333)，表示 Pod 当前阶段的状态。Pod 的 Phase 状态是 Pod 在其生命周期中的高度概括，包括 `Pending`，`Running`，`Succeeded`，`Failed` 和 `Unknown` 这几个值。状态的产生过程非常复杂，因此很有必要深入深挖一下：
+   * 首先，串行执行一系列 `PodSyncHandlers`，每个处理器检查 Pod 是否应该运行在该节点上。当其中之一的处理器认为该 Pod 不应该运行在该节点上，则 Pod 的 Phase 值就会[变成 `PodFailed`](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet_pods.go#L1340-L1345) 并将从该节点被驱逐。例如，以 Job 为例，当一个 Pod 失败重试的时间超过了 `activeDeadlineSeconds` 设置的值，就会将该 Pod 从该节点驱逐出去；
+   * 接下来，Pod 的 Phase 值由 init 容器和主容器状态共同决定。由于主容器尚未启动，容器被视为处于[等待阶段](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet_pods.go#L1284)，如果 [Pod 中至少有一个容器处于等待阶段，则其 Phase 值为 `Pending`](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet_pods.go#L1298-L1301)。
    * 最后，Pod 的 Condition 字段由 Pod 内所有容器状态决定。现在我们的容器还没有被容器运行时 (Container Runtime) 创建，所以，Kubelet [将 `PodReady` 的状态设置为 False](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/status/generate.go#L72-L83)。
 3. 生成 PodStatus 之后，Kubelet 就会将它发送到 Pod 的 status 管理器，该管理器的任务是通过 kube-apiserver 异步更新 etcd 中的记录；
 4. 接下来运行一系列 admit handlers 以确保该 Pod 具有正确的权限（包括强制执行 [AppArmor profiles 和 NO\_NEW\_PRIVS](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet.go#L864-L865)），在该阶段被拒绝的 Pod 将永久处于 `Pending` 状态；
 5. 如果 Kubelet 启动时指定了 `--cgroups-per-qos` 参数，Kubelet 就会为该 Pod 创建 cgroup 并设置对应的资源限制。这是为了更好的 Pod 服务质量（QoS）；
-6. 为 Pod [创建相应的数据目录](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet\_pods.go#L826-L839)，包括：
+6. 为 Pod [创建相应的数据目录](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kubelet_pods.go#L826-L839)，包括：
    * Pod 目录 (通常是 `/var/run/kubelet/pods/<podID>`)；
    * Pod 的挂载卷目录 (`<podDir>/volumes`)；
    * Pod 的插件目录 (`<podDir>/plugins`)。
-7. 卷管理器会[挂载 `Spec.Volumes` 中定义的相关数据卷](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/volumemanager/volume\_manager.go#L339)，然后等待挂载成功；
+7. 卷管理器会[挂载 `Spec.Volumes` 中定义的相关数据卷](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/volumemanager/volume_manager.go#L339)，然后等待挂载成功；
 8. 从 kube-apiserver 中检索 `Spec.ImagePullSecrets`，然后将对应的 Secret 注入到容器中；
 9. 最后，通过容器运行时 （Container Runtime） 启动容器（下面会详细描述）。
 
@@ -325,7 +325,7 @@ Scheduler 作为一个独立的组件运行在集群控制平面上，工作方�
 
 这是一个非常酷的想法，因为通过在 Kubelet 和容器运行时之间使用已定义的接口约定，容器编排的实际实现细节变得无关紧要。重要的是接口约定。这允许以最小的开销添加新的容器运行时，因为没有核心 Kubernetes 代码需要更改！
 
-回到部署我们的容器，当一个 Pod 首次启动时， Kubelet [调用 RunPodSandbox 远程过程命令 （remote procedure command RPC）](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime\_sandbox.go#L65)。沙箱 （sandbox） 是描述一组容器的 CRI 术语，在 Kubernetes 中对应的是 Pod。这个术语是故意模糊的，因此其他不使用容器的运行时，不会失去其意义（想象一个基于 hypervisor 的运行时，沙箱可能指的是 VM）。
+回到部署我们的容器，当一个 Pod 首次启动时， Kubelet [调用 RunPodSandbox 远程过程命令 （remote procedure command RPC）](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_sandbox.go#L65)。沙箱 （sandbox） 是描述一组容器的 CRI 术语，在 Kubernetes 中对应的是 Pod。这个术语是故意模糊的，因此其他不使用容器的运行时，不会失去其意义（想象一个基于 hypervisor 的运行时，沙箱可能指的是 VM）。
 
 在我们的例子中，我们使用的是 Docker。 在 Docker 中，创建沙箱涉及创建 `pause` 容器。
 
@@ -389,13 +389,13 @@ flannel 不会管容器与宿主机之间的通信（这是 CNI 插件的职责�
 
 所有的网络配置都已完成。还剩什么？真正地启动工作负载容器！
 
-一旦沙箱完成初始化并处于 `active` 状态， Kubelet 将开始为其创建容器。首先[启动 PodSpec 中定义的 Init Container](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime\_manager.go#L736)，然后再启动主容器。具体过程如下：
+一旦沙箱完成初始化并处于 `active` 状态， Kubelet 将开始为其创建容器。首先[启动 PodSpec 中定义的 Init Container](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_manager.go#L736)，然后再启动主容器。具体过程如下：
 
-1. [拉取容器的镜像](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime\_container.go#L95)。如果是私有仓库的镜像，就会使用 PodSpec 中指定的 imagePullSecrets 来拉取该镜像；
-2. [通过 CRI 创建容器](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime\_container.go#L124)。 Kubelet 使用 PodSpec 中的信息填充了一个 `ContainerConfig` 数据结构（在其中定义了 command， image， labels， mounts， devices， environment variables 等），然后通过 protobufs 发送给 CRI。 对于 Docker 来说，它会将这些信息反序列化并填充到自己的配置信息中，然后再发送给 Dockerd 守护进程。在这个过程中，它会将一些元数据（例如容器类型，日志路径，sandbox ID 等）添加到容器中；
+1. [拉取容器的镜像](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_container.go#L95)。如果是私有仓库的镜像，就会使用 PodSpec 中指定的 imagePullSecrets 来拉取该镜像；
+2. [通过 CRI 创建容器](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_container.go#L124)。 Kubelet 使用 PodSpec 中的信息填充了一个 `ContainerConfig` 数据结构（在其中定义了 command， image， labels， mounts， devices， environment variables 等），然后通过 protobufs 发送给 CRI。 对于 Docker 来说，它会将这些信息反序列化并填充到自己的配置信息中，然后再发送给 Dockerd 守护进程。在这个过程中，它会将一些元数据（例如容器类型，日志路径，sandbox ID 等）添加到容器中；
 3. 然后 Kubelet 将容器注册到 CPU 管理器，它通过使用 `UpdateContainerResources` CRI 方法给容器分配给本地节点上的 CPU 资源；
-4. 最后[容器真正地启动](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime\_container.go#L144)；
-5. 如果 Pod 中包含 [Container Lifecycle Hooks](https://v1-14.docs.kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)，容器启动之后就会[运行这些 Hooks](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime\_container.go#L170-L185)。 Hook 的类型包括两种：Exec（执行一段命令） 和 HTTP（发送HTTP请求）。如果 PostStart Hook 启动的时间过长、挂起或者失败，容器将永远不会变成 Running 状态。
+4. 最后[容器真正地启动](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_container.go#L144)；
+5. 如果 Pod 中包含 [Container Lifecycle Hooks](https://v1-14.docs.kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)，容器启动之后就会[运行这些 Hooks](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_container.go#L170-L185)。 Hook 的类型包括两种：Exec（执行一段命令） 和 HTTP（发送HTTP请求）。如果 PostStart Hook 启动的时间过长、挂起或者失败，容器将永远不会变成 Running 状态。
 
 ### Wrap-up
 

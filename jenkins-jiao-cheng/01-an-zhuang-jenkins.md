@@ -8,12 +8,12 @@ jenkins 是最老牌功能最全的devops平台，适合市面上99%的场景，
 
 ## 为什么选择 jenkins
 
-* **掌握 CI/CD 管道：**高效地自动构建、测试和部署代码。
-* **自动执行重复任务：**节省时间并减少软件开发中的人为错误。
-* **广泛的工具集成：**可与 Git、Maven、Docker 和 Kubernetes 等众多工具配合使用。
-* **促进团队协作：**促进持续集成和反馈，改善团队工作流程。
-* **可扩展性：**支持具有分布式构建的大型项目。
-* **职业发展：**对 Jenkins 专业知识的高需求带来了更好的工作机会。
+* **掌握 CI/CD 管道：**&#x9AD8;效地自动构建、测试和部署代码。
+* **自动执行重复任务：**&#x8282;省时间并减少软件开发中的人为错误。
+* **广泛的工具集成：**&#x53EF;与 Git、Maven、Docker 和 Kubernetes 等众多工具配合使用。
+* **促进团队协作：**&#x4FC3;进持续集成和反馈，改善团队工作流程。
+* **可扩展性：**&#x652F;持具有分布式构建的大型项目。
+* **职业发展：**&#x5BF9; Jenkins 专业知识的高需求带来了更好的工作机会。
 
 ## 安装
 
@@ -84,7 +84,7 @@ sudo docker exec ${CONTAINER_ID or CONTAINER_NAME} cat /var/jenkins_home/secrets
 
 <figure><img src="../.gitbook/assets/image (28).png" alt=""><figcaption></figcaption></figure>
 
-[解锁 Jenkins](https://www.jenkins.io/doc/book/installing/docker/#unlocking-jenkins)后，会出现**“自定义 Jenkins”**页面。作为初始设置的一部分，您可以在此处安装任意数量的有用插件。这里我们选择第一个，仅仅安装默认插件。
+[解锁 Jenkins](https://www.jenkins.io/doc/book/installing/docker/#unlocking-jenkins)后，会出&#x73B0;**“自定义 Jenkins”**&#x9875;面。作为初始设置的一部分，您可以在此处安装任意数量的有用插件。这里我们选择第一个，仅仅安装默认插件。
 
 <figure><img src="../.gitbook/assets/1730336059284.png" alt=""><figcaption></figcaption></figure>
 

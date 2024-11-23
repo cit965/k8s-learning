@@ -8,7 +8,7 @@ _scheduling framework_  是 Kubernetes 调度器的可插拔架构，它由一�
 
 调度框架定义了一些扩展点，调度程序插件注册以在一个或多个扩展点处调用。
 
-每次尝试调度一个 Pod 都会分为两个阶段：**scheduling cycle（**调度周期）和**binding cycle（**绑定周期）。
+每次尝试调度一个 Pod 都会分为两个阶段：**scheduling cycle（**&#x8C03;度周期）和**binding cycle（**&#x7ED1;定周期）。
 
 ## 调度周期&绑定周期
 

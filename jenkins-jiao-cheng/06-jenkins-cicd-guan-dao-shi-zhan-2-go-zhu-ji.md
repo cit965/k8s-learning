@@ -76,8 +76,8 @@ func TestHandler(t *testing.T) {
 
 #### 先决条件 <a href="#id-383e" id="id-383e"></a>
 
-1. **Ubuntu 主机：**有一个可用于部署的 Ubuntu 主机。在此示例中，我们将使用 IP 地址`172.16.137.133`和用户名`nn` 。
-2. **SSH 密钥对：**生成 SSH 密钥对以安全访问 Ubuntu 主机。
+1. **Ubuntu 主机：**&#x6709;一个可用于部署的 Ubuntu 主机。在此示例中，我们将使用 IP 地址`172.16.137.133`和用户名`nn` 。
+2. **SSH 密钥对：**&#x751F;成 SSH 密钥对以安全访问 Ubuntu 主机。
 
 #### (1) 生成SSH密钥对 <a href="#id-0b18" id="id-0b18"></a>
 

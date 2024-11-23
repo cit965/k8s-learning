@@ -10,7 +10,7 @@ description: scheduler
 
 
 
-当您使用 kubectl 提交 deployment 时，API 服务器会收到请求，并将资源存储在 etcd 中。那么_谁创建了 Pod？_
+当您使用 kubectl 提交 deployment 时，API 服务器会收到请求，并将资源存储在 etcd 中。那&#x4E48;_&#x8C01;创建了 Pod？_
 
 <figure><img src="https://miro.medium.com/v2/resize:fit:1400/0*fhb_XLY2TFSJNG6k.png" alt=""><figcaption></figcaption></figure>
 
