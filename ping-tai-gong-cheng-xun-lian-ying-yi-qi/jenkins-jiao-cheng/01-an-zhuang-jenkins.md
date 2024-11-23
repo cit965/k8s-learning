@@ -82,24 +82,24 @@ docker run --name jenkins-blueocean --restart=on-failure --detach \
 sudo docker exec ${CONTAINER_ID or CONTAINER_NAME} cat /var/jenkins_home/secrets/initialAdminPassword 
 ```
 
-<figure><img src="../.gitbook/assets/image (28).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (28).png" alt=""><figcaption></figcaption></figure>
 
 [解锁 Jenkins](https://www.jenkins.io/doc/book/installing/docker/#unlocking-jenkins)后，会出&#x73B0;**“自定义 Jenkins”**&#x9875;面。作为初始设置的一部分，您可以在此处安装任意数量的有用插件。这里我们选择第一个，仅仅安装默认插件。
 
-<figure><img src="../.gitbook/assets/1730336059284.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730336059284.png" alt=""><figcaption></figcaption></figure>
 
 选择完成后，插件开始安装，耐心等待即可：
 
-<figure><img src="../.gitbook/assets/1730336100806.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730336100806.png" alt=""><figcaption></figcaption></figure>
 
 插件安装完成后会要求我们创建一个管理员账号，输入账号密码邮箱即可：
 
-<figure><img src="../.gitbook/assets/1730336283030.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730336283030.png" alt=""><figcaption></figcaption></figure>
 
 创建完管理员账号后，会要求我们确认回调地址，回调地址用来接收一些外部系统的调用，包括电子邮件通知、PR 状态更新以及为构建步骤提供的`BUILD_URL`环境变量。你需要看看默认的地址是否合适：
 
-<figure><img src="../.gitbook/assets/1730336463931.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730336463931.png" alt=""><figcaption></figcaption></figure>
 
 到此 Jenkins 已经安装完毕，下面可以正式开始我们的 jenkins 学习之旅了！
 
-<figure><img src="../.gitbook/assets/1730336519268.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730336519268.png" alt=""><figcaption></figcaption></figure>

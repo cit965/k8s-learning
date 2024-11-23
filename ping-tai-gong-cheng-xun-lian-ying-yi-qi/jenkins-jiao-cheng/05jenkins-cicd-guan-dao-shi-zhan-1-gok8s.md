@@ -1,6 +1,6 @@
-# 05、如何为您的 Golang 应用程序设置 Jenkins CI/CD 管道【实战1】
+# 05、Jenkins CI/CD 管道实战1 【go-k8s】
 
-![Jenkins CI/CD pipeline](https://mattermost.com/wp-content/uploads/2022/04/04\_Jenkins\_CI\_CD@2x.webp)
+![Jenkins CI/CD pipeline](https://mattermost.com/wp-content/uploads/2022/04/04_Jenkins_CI_CD@2x.webp)
 
 在开始之前，本指南中的所有示例均基于[此 GitHub 存储库](https://github.com/shadowshot-x/micro-product-go/tree/Testing-CICD)中找到的代码。
 
@@ -8,7 +8,7 @@
 
 你需要先安装 golang，docker  插件，这让 Jenkins 节点知道 Docker 和 Golang 在插件中可用。
 
-<figure><img src="../.gitbook/assets/2b04b6b18327a9e9e5cccbe102842f4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/2b04b6b18327a9e9e5cccbe102842f4.png" alt=""><figcaption></figcaption></figure>
 
 ![installing plugins/upgrades](https://mattermost.com/wp-content/uploads/2022/04/image2-1-1024x446.webp)
 

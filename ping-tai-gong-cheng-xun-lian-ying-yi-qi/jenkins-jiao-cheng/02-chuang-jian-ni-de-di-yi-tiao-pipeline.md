@@ -12,7 +12,7 @@ Jenkins Pipeline 提供了一组可扩展的工具，用于将简单到复杂的
 
 需要安装 docker pipeline 插件，默认是已经安装了，你也可以去插件列表检查下。
 
-<figure><img src="../.gitbook/assets/a788c2905fac586cca0b2e9ce61269b.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/a788c2905fac586cca0b2e9ce61269b.png" alt=""><figcaption></figcaption></figure>
 
 ## 快速入门示例
 
@@ -20,11 +20,11 @@ Jenkins Pipeline 提供了一组可扩展的工具，用于将简单到复杂的
 
 
 
-<figure><img src="../.gitbook/assets/2ef7a480c6d24d0e0acdcace101c7d8.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/2ef7a480c6d24d0e0acdcace101c7d8.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../.gitbook/assets/6157b3f518a98652e14ae0e8d909fb8.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/6157b3f518a98652e14ae0e8d909fb8.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../.gitbook/assets/1730356152314.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730356152314.png" alt=""><figcaption></figcaption></figure>
 
 下面是一些各种语言的简单示例，笔者比较熟悉go，所以我配置了go 语言的流水线任务。
 
@@ -78,11 +78,11 @@ pipeline {
 
 当配置完流水线，返回主页会发现多了个任务,点击绿色箭头即可执行：
 
-<figure><img src="../.gitbook/assets/1730356897234.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730356897234.png" alt=""><figcaption></figcaption></figure>
 
 想要查看执行日志的话可以点击具体的流水线任务，点击Console Output:
 
-<figure><img src="../.gitbook/assets/1730357788000.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730357788000.png" alt=""><figcaption></figcaption></figure>
 
 如图，任务执行失败，访问 docker 镜像仓库的时候有问题，这个是因为 GFW 的原因，你可以替换国内镜像仓库，也可以执行更加简单的流水线任务：
 
