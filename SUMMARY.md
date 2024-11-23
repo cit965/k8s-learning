@@ -78,7 +78,8 @@
 
 ***
 
-* [helm 教程](helm-jiao-cheng.md)
+* [helm 教程](helm-jiao-cheng/README.md)
+  * [01](helm-jiao-cheng/01.md)
 
 ## jenkins 教程
 
