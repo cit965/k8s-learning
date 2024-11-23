@@ -79,7 +79,12 @@
 ***
 
 * [helm 教程](helm-jiao-cheng/README.md)
-  * [01](helm-jiao-cheng/01.md)
+  * [01-快速入门](helm-jiao-cheng/01.md)
+  * [02-如何使用](helm-jiao-cheng/02.md)
+  * [03-制作chart](helm-jiao-cheng/03.md)
+  * [04-chart学习](helm-jiao-cheng/04.md)
+  * [05-chart hook](helm-jiao-cheng/05.md)
+  * [06-chart 指南](helm-jiao-cheng/06.md)
 
 ## jenkins 教程
 
