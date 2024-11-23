@@ -1,4 +1,4 @@
-# 01、VScode编辑器上编译C\#
+# 02、VScode编辑器上编译C\#
 
 ### .NET 下载 <a href="#h_576402546_0" id="h_576402546_0"></a>
 
@@ -16,12 +16,12 @@ VS Code下载地址：[Download Visual Studio Code - Mac, Linux, Windows](https:
 
 下载插件：C#
 
-<figure><img src="../.gitbook/assets/1730871284206.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730871284206.png" alt=""><figcaption></figcaption></figure>
 
 在桌面新建一个工程文件夹，并且VS Code中打开，在菜单栏中打开终端，输入dotnet new console 初始化程序。
 
-<figure><img src="../.gitbook/assets/1730871561423.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730871561423.png" alt=""><figcaption></figcaption></figure>
 
 调出终端，输入dotnet run 运行。
 
-<figure><img src="../.gitbook/assets/1730871608328.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/1730871608328.png" alt=""><figcaption></figcaption></figure>

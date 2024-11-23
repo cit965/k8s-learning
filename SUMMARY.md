@@ -92,11 +92,10 @@
   * [05、Jenkins CI/CD 管道实战1 【go-k8s】](ping-tai-gong-cheng-xun-lian-ying-yi-qi/jenkins-jiao-cheng/05jenkins-cicd-guan-dao-shi-zhan-1-gok8s.md)
   * [06、 Jenkins CI/CD 管道实战2 【go-主机】](ping-tai-gong-cheng-xun-lian-ying-yi-qi/jenkins-jiao-cheng/06-jenkins-cicd-guan-dao-shi-zhan-2-go-zhu-ji.md)
 
-## c# 编程入门
+## 编程语言
 
-* [01、c# 之旅](c-bian-cheng-ru-men/01c-zhi-l.md)
-* [02、VScode编辑器上编译C#](c-bian-cheng-ru-men/02vscode-bian-ji-qi-shang-bian-yi-c.md)
-
-## python 从入门到放弃
-
-* [python 教程](python-cong-ru-men-dao-fang-qi/python-jiao-cheng.md)
+* [python入门](bian-cheng-yu-yan/python-ru-men/README.md)
+  * [python 教程](bian-cheng-yu-yan/python-ru-men/python-jiao-cheng.md)
+* [c#入门](bian-cheng-yu-yan/c-ru-men/README.md)
+  * [01、c# 之旅](bian-cheng-yu-yan/c-ru-men/01c-zhi-l.md)
+  * [02、VScode编辑器上编译C#](bian-cheng-yu-yan/c-ru-men/02vscode-bian-ji-qi-shang-bian-yi-c.md)
