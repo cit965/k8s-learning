@@ -13,7 +13,10 @@
 
 ```bash
 kubectl create deployment nginx --image=nginx --replicas=3
+```
 ````
+
+
 
 几秒后，你将看到三个 Nginx Pod 分布在集群工作节点上。这相当神奇，但它背后究竟发生了什么？
 
