@@ -25,35 +25,6 @@ Kubernetes 是一个神奇的框架，它通过用户友好（user-friendly）�
 
 本指南将带领你充分了解从 Kubectl 客户端到 Kubelet 请求的完整生命周期，并在必要时通过源代码解释它到底是什么。
 
-**注**：本文所有内容基于 `Kubernetes v1.14.0`。
-
-## 目录
-
-* What happens when I type kubectl run?
-  * Kubectl
-    * Validation and generators
-    * API groups and version negotiation
-    * Client auth
-  * kube-apiserver
-    * Authentication
-    * Authorization
-    * Admission Controller
-  * etcd
-  * Control loops
-    * Deployment Controller
-    * ReplicaSet Controller
-    * Informers
-    * Scheduler
-  * Kubelet
-    * Pod Sync
-    * CRI and pause container
-    * CNI and pod networking
-    * Inter-host networking
-    * Container startup
-  * Wrap-up
-
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
-
 ### Kubectl
 
 #### Validation and generators
@@ -149,8 +120,6 @@ kube-apiserver 是客户端和系统组件用来持久化和检索集群状态�
 虽然我们证明了自己是谁，但还没证明有权执行此操作。毕竟，身份 (identity) 和许可 (permission) 并不是一回事。因此 kube-apiserver 需要授权。
 
 kube-apiserver 处理授权的方式与身份验证非常相似：基于 [CLI 参数](https://v1-14.docs.kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/) 输入，汇集一系列 authorizer， 这些 authorizer 将针对每个传入请求运行。如果所有 authorizer 都拒绝该请求，则该请求将导致 `Forbidden` 响应并且[不再继续](https://github.com/kubernetes/apiserver/blob/kubernetes-1.14.0/pkg/endpoints/filters/authorization.go#L76)。如果单个 authorizer 批准，则请求继续。
-
-Kubernetes v1.14 的 authorizer 实例：
 
 * [webhook](https://github.com/kubernetes/apiserver/blob/kubernetes-1.14.0/plugin/pkg/authorizer/webhook/webhook.go#L152)：与集群外的 HTTP(S) 服务交互；
 * [ABAC](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/auth/authorizer/abac/abac.go#L224)：执行静态文件中定义的策略；
