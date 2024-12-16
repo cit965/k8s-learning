@@ -8,69 +8,35 @@
 ```
 {% endcode %}
 
-````ini
 想象一下，当你想在 Kubernetes 集群部署 Nginx 时，你会执行以下命令：
 
-```bash
+```
 kubectl create deployment nginx --image=nginx --replicas=3
 ```
-````
 
+几秒后，你将看到三个 Nginx Pod 出现在集群节点上。这相当神奇，但它背后究竟发生了什么？
 
+Kubernetes 是一个神奇的框架，通过简单的抽象隐藏了背后的复杂性。本文将带领你充分了解从 Kubectl 客户端到 Kubelet 请求的完整生命周期，并在必要时通过源代码解释它到底是什么。
 
-几秒后，你将看到三个 Nginx Pod 分布在集群工作节点上。这相当神奇，但它背后究竟发生了什么？
+## Kubectl
 
+首先，当我们敲下回车键执行命令后， Kubectl 会执行客户端验证，以确保非法的请求（例如，创建不支持的资源或使用[格式错误的镜像名称](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L264)）快速失败，并不会发送给 kube-apiserver。
 
-
-几秒后，你将看到三个 Nginx Pod 分布在集群工作节点上。这相当神奇，但它背后究竟发生了什么？
-
-Kubernetes 是一个神奇的框架，它通过用户友好（user-friendly）的 API 处理跨基础架构的 Workload 部署。通过简单的抽象隐藏了背后的复杂性。但是，为了充分理解它为我们提供的价值，我们需要理解它的原理。
-
-本指南将带领你充分了解从 Kubectl 客户端到 Kubelet 请求的完整生命周期，并在必要时通过源代码解释它到底是什么。
-
-### Kubectl
-
-#### Validation and generators
-
-首先，当我们敲下回车键执行命令后， Kubectl 会执行客户端验证，以确保非法的请求（例如，创建不支持的资源或使用[格式错误的镜像名称](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L264)）快速失败，并不会发送给 kube-apiserver，即通过减少不必要的负载来提高系统性能。
-
-验证通过后， Kubectl 开始构造它将发送给 kube-apiserver 的 HTTP 请求。在 Kubernetes 中，访问或更改状态的所有尝试都通过 kube-apiserver 进行，​​后者又与 etcd 进行通信。 Kubectl 客户端也不例外。为了构造 HTTP 请求， Kubectl 使用称为 [generators](https://kubernetes.io/docs/user-guide/kubectl-conventions/#generators) 的东西，这是一个负责序列化的抽象概念。
+验证通过后， kubectl 开始构造它将发送给 kube-apiserver 的 HTTP 请求。为了构造 HTTP 请求， Kubectl 使用称为 [generators](https://kubernetes.io/docs/user-guide/kubectl-conventions/#generators) 的东西，这是一个负责序列化的抽象概念。
 
 你可能没有注意到，通过 `kubectl run` 不仅可以运行 `deployment`，还可以通过指定参数 `--generator` 来部署其它 workload。
 
-如果没有指定 `--generator` 参数的值， Kubectl 将会自动[推断](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L319-L339)资源的类型，具体如下：
+### API groups and version negotiation
 
-* 具有 `--restart-policy=Always` 的资源被视为 Deployment；
-* 具有 `--restart-policy=OnFailure` 的资源被视为 Job；
-* 具有 `--restart-policy=Never` 的资源被视为 Pod。
+kubectl 生成运行时对象之后，它开始为它[查找合适的 API Group 和版本](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L674-L686)，然后组装一个知道该资源的各种 REST 语义的[版本化客户端](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L705-L708)。
 
-Kubectl 还将确定是否需要触发其他操作，例如记录命令（用于部署或审计），或者此命令是否是 dry run。
-
-> From wikipedia
->
-> 空运行（dry run）也称为试运行（practice run），是刻意为了减轻可能失效的影响而有的测试流程。例如飞机公司会先在飞机停在陆地上时进行其弹射座椅的测试，之后才在飞机升空后主进行类似测试。陆地上的测试即为空运行。
->
-> 在验收程序（也称为工厂验收测试）的领域中，空运行是指分包商需在产品交给客户，进行真正的验收测试之前，先进行的完整测试。
-
-当 Kubectl 判断出要创建一个 Deployment 后，它将使用 `DeploymentV1Beta1 generator` 配合我们提供的参数，生成一个[运行时对象（Runtime Object）](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/generate/versioned/run.go#L237)。
-
-#### API groups and version negotiation
-
-这里值得指出的是， Kubernetes 使用的是一个分类为 API Group 的版本化 API。它旨在对资源进行分类，以便于推理。
-
-同时，它还为单个 API 提供了更好的版本化方案。 Deployment 的 API Group 为 `apps`，其最新版本为 `v1`。这就是为什么需要在 Deployment manifests 顶部指定 `apiVersion: apps/v1` 的原因。
-
-回归正文， Kubectl 生成运行时对象之后，它开始为它[查找合适的 API Group 和版本](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L674-L686)，然后组装一个知道该资源的各种 REST 语义的[版本化客户端](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L705-L708)。
-
-这个发现阶段称为版本协商 (version negotiation)，涉及 Kubectl 扫描 remote API 上的 `/apis` 路径以检索所有可能的 API Group。
-
-由于 kube-apiserver 在 `/apis` 路径中暴露其 OpenAPI 格式的 scheme 文档，因此客户端可以轻松的找到匹配的 API。
+这个发现阶段称为版本协商 (version negotiation)，kubectl 扫描 kube-apiserver `/apis` 路径以检索所有可能的 API Group。由于 kube-apiserver 在 `/apis` 路径中暴露其 OpenAPI 格式的 scheme 文档，因此客户端可以轻松的找到匹配的 API。
 
 为了提高性能， Kubectl 还将 [OpenAPI scheme 缓存到 `~/.kube/cache/discovery` 目录](https://github.com/kubernetes/kubernetes/blob/v1.14.0/staging/src/k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#L234)。如果要了解 API 发现的完整过程，你可以尝试删除该目录并在运行 Kubectl 命令时将 `-v` 参数的值设为最大，然后你将会在日志中看到所有试图找到这些 API 版本的 HTTP 请求。
 
 最后一步才是真正地[发送 HTTP 请求](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L709)。一旦请求获得成功的响应， Kubectl 将会根据所需的[输出格式](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubectl/cmd/run/run.go#L459)打印 success message。
 
-#### Client auth
+### Client auth
 
 我们在上文中没有提到的一件事是客户端身份验证（这是在发送 HTTP 请求之前处理的），现在让我们来看看。
 
@@ -89,9 +55,9 @@ Kubectl 还将确定是否需要触发其他操作，例如记录命令（用于
 * 用户名和密码通过 HTTP 基础认证[发送](https://github.com/kubernetes/client-go/blob/kubernetes-1.14.0/transport/round_trippers.go#L197)；
 * OpenID 认证过程是由用户事先手动处理的，产生一个像 bearer token 一样被发送的 token。
 
-### kube-apiserver
+## kube-apiserver
 
-#### Authentication
+### Authentication（认证）
 
 我们的请求已经发送成功，接下来呢？kube-apiserver！
 
@@ -114,11 +80,9 @@ kube-apiserver 是客户端和系统组件用来持久化和检索集群状态�
 
 如果认证成功，则会从请求中删除 `Authorization` 标头，并[将用户信息添加到其上下文中](https://github.com/kubernetes/apiserver/blob/kubernetes-1.14.0/pkg/endpoints/filters/authentication.go#L74-L77)。为之后的操作（例如授权和准入控制器）提供访问先前建立的用户身份的能力。
 
-#### Authorization
+### Authorization（授权）
 
 好的，请求已发送，kube-apiserver 已成功验证我们是谁。终于解脱了？！
-
-想太多！
 
 虽然我们证明了自己是谁，但还没证明有权执行此操作。毕竟，身份 (identity) 和许可 (permission) 并不是一回事。因此 kube-apiserver 需要授权。
 
@@ -129,7 +93,7 @@ kube-apiserver 处理授权的方式与身份验证非常相似：基于 [CLI �
 * [RBAC](https://github.com/kubernetes/kubernetes/blob/v1.14.0/plugin/pkg/auth/authorizer/rbac/rbac.go#L74)：执行由集群管理员添加为 k8s 资源的 RBAC 规则；
 * [Node](https://github.com/kubernetes/kubernetes/blob/v1.14.0/plugin/pkg/auth/authorizer/node/node_authorizer.go#L80)：确保 kubelet 只能访问自己节点上的资源。
 
-#### Admission Controller
+### Admission Controller
 
 好的，到目前为止，我们已经过认证并获得了 kube-apiserver 的授权。那接下来呢？
 
@@ -143,7 +107,7 @@ Admission Controller 设计的真正优势在于它致力于提&#x5347;_&#x53EF;
 
 Kubernetes 目前提供十多种 Admission Controller，此处建议阅读文档 [Kubernetes Admission Controller](https://v1-14.docs.kubernetes.io/docs/reference/access-authn-authz/admission-controllers/)。
 
-### etcd
+## etcd
 
 到目前为止， Kubernetes 已经完全审查了传入的请求，并允许它往下走。在下一步中，kube-apiserver 将反序列化 HTTP 请求，构造运行时对象（runtime object）（有点像 kubectl generator 的逆过程），并将它们持久化到 etcd。
 
@@ -169,19 +133,19 @@ Kubernetes 目前提供十多种 Admission Controller，此处建议阅读文档
 
 这么多步骤！能够坚持走到这里是非常了不起的，并且我们意识到了 kube-apiserver 实际上做了很多工作。总结一下：我们部署的 Deployment 现在存在于 etcd 中，但仍没有看到它真正的 work...
 
-**注**：在 Kubernetes v1.14 之前，这往后还有 Initializer 的步骤，该步骤在 v1.14 [被 webhook admission 取代](https://github.com/kubernetes/kubernetes/issues/67113)。
+## Controller
 
-### Control loops
+### Deployment Controller
 
-#### Deployment Controller
-
-截至目前，我们的 Deployment 已经存储于 etcd 中，并且所有的初始化逻辑都已完成。接下来的阶段将涉及 Deployment 所依赖的资源拓扑结构。
-
-在 Kubernetes， Deployment 实际上只是 ReplicaSet 的集合，而 ReplicaSet 是 Pod 的集合。那么 Kubernetes 如何从一个 HTTP 请求创建这个层次结构呢？这就不得不提 Kubernetes 的内置控制器 （Controller）。
+截至目前，我们的 Deployment 已经存储于 etcd 中，并且所有的初始化逻辑都已完成。接下来由 Controller 控制器接手。
 
 Kubernetes 系统中使用了大量的 Controller， Controller 是一个用于将系统状态从`当前状态`调谐到`期望状态`的异步脚本。所有内置的 Controller 都通过组件 kube-controller-manager 并行运行，每种 Controller 都负责一种具体的控制流程。
 
+
+
 首先，我们介绍一下 Deployment Controller：
+
+在 Kubernetes， Deployment 实际上只是 ReplicaSet 的集合，而 ReplicaSet 是 Pod 的集合。那么 Kubernetes 如何从一个 HTTP 请求创建这个层次结构呢？这就不得不提 Kubernetes 的内置控制器 （Controller）。
 
 将 Deployment 存储到 etcd 后，我们通过 kube-apiserver 可以看到它。当这个新资源可用时， Deployment Controller 会检测到它，它的工作是监听 Deployment 的更改。在我们的例子中， Controller 通过[注册创建事件的回调函数](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/deployment_controller.go#L122)（更多相关信息，参见下文）。
 
@@ -197,7 +161,7 @@ ReplicaSet 的 PodSpec 字段是从 Deployment 的 manifest 以及其他相关�
 
 当完成以上步骤之后，该 [Deployment 的 status 就会被更新](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/controller/deployment/sync.go#L67)，然后重新进入与之前相同的循环，等待 Deployment 与期望的状态相匹配。由于 Deployment Controller 只关心 ReplicaSet， 因此调谐过程将由 ReplicaSet Controller 继续。
 
-#### ReplicaSet Controller
+### ReplicaSet Controller
 
 在上一步中，Deployment Controller 创建了属于该 Deployment 的第一个 ReplicaSet， 但仍然没有创建 Pod。 所以这里我们需要引入 ReplicaSet Controller！
 
@@ -230,7 +194,7 @@ Infomer 是一种模式，它允许 Controller 订阅存储事件并列出它们
 
 有关 Informer 的更多信息，可深入阅读 [《Kubernetes: Controllers, Informers, Reflectors and Stores》](http://borismattijssen.github.io/articles/kubernetes-informers-controllers-reflectors-stores)
 
-#### Scheduler
+## Scheduler
 
 当所有的 Controller 正常运行后，etcd 中就会保存一个 Deployment、一个 ReplicaSet 和 三个 Pod， 并且可以通过 kube-apiserver 查看到。然而，这些 Pod 还处于 `Pending` 状态，因为它们还没有被调度到集群中合适的 Node 上。最终解决这个问题的 Controller 是 Scheduler。
 
@@ -255,7 +219,7 @@ Scheduler 作为一个独立的组件运行在集群控制平面上，工作方�
 
 附注：自定义调度器：有趣的是预选策略和优先级函数 （predicates and priority functions） 都是可扩展的，可以使用参数 `--policy-config-file` 来定义。这引入了一定程度的灵活性。管理员还可以在独立部署中运行自定义调度器（具有自定义处理逻辑的调度器）。如果 PodSpec 中包含 `schedulerName`，Kubernetes 会将该 pod 的调度移交给使用该名称注册的调度器。
 
-### Kubelet
+## Kubelet
 
 #### Pod Sync
 
@@ -311,7 +275,7 @@ Scheduler 作为一个独立的组件运行在集群控制平面上，工作方�
 
 创建 `pause` 容器后，将开始检查磁盘状态然后启动主容器。
 
-#### CNI and pod networking
+### CNI and pod networking
 
 现在，我们的 Pod 有了基本的骨架：一个 `pause` 容器，它托管所有 Namespaces 以允许 Pod 间通信。但容器网络如何运作以及建立的？
 
@@ -347,7 +311,7 @@ CNI 插件还可以通过 `CNI_ARGS` 环境变量为 Pod 指定其他的元数�
    * IPAM Plugin 的工作方式和 CNI 插件类似：通过二进制文件调用并具有标准化的接口，每一个 IPAM Plugin 都必须要确定容器网络接口的 IP、子网以及网关和路由，并将信息返回给 CNI 插件。最常见的 IPAM Plugin 称为 host-local，它从预定义的一组地址池为容器分配 IP 地址。它将相关信息保存在主机的文件系统中，从而确保了单个主机上每个容器 IP 地址的唯一性。
 4. 对于 DNS， Kubelet 将为 CNI 插件指定 Kubernetes 集群内部 DNS 服务器 IP 地址，确保正确设置容器的 `resolv.conf` 文件。
 
-#### Inter-host networking
+### Inter-host networking
 
 到目前为止，我们已经描述了容器如何与宿主机进行通信，但跨主机之间的容器如何通信呢？
 
@@ -357,7 +321,7 @@ flannel 不会管容器与宿主机之间的通信（这是 CNI 插件的职责�
 
 更多信息，请深入阅读 [CoreOS's documentation](https://github.com/coreos/flannel)。
 
-#### Container startup
+### Container startup
 
 所有的网络配置都已完成。还剩什么？真正地启动工作负载容器！
 
@@ -368,8 +332,6 @@ flannel 不会管容器与宿主机之间的通信（这是 CNI 插件的职责�
 3. 然后 Kubelet 将容器注册到 CPU 管理器，它通过使用 `UpdateContainerResources` CRI 方法给容器分配给本地节点上的 CPU 资源；
 4. 最后[容器真正地启动](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_container.go#L144)；
 5. 如果 Pod 中包含 [Container Lifecycle Hooks](https://v1-14.docs.kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)，容器启动之后就会[运行这些 Hooks](https://github.com/kubernetes/kubernetes/blob/v1.14.0/pkg/kubelet/kuberuntime/kuberuntime_container.go#L170-L185)。 Hook 的类型包括两种：Exec（执行一段命令） 和 HTTP（发送HTTP请求）。如果 PostStart Hook 启动的时间过长、挂起或者失败，容器将永远不会变成 Running 状态。
-
-### Wrap-up
 
 最后的最后，现在我们的集群上应该会运行三个容器，分布在一个或多个工作节点上。所有的网络，数据卷和秘钥都由 Kubelet 填充，并通过 CRI 接口添加到容器中并配置成功！
 
