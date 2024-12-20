@@ -69,7 +69,8 @@
 
 ## 平台工程训练营一期
 
-* [ansible 教程](ping-tai-gong-cheng-xun-lian-ying-yi-qi/ansible-jiao-cheng.md)
+* [ansible 教程](ping-tai-gong-cheng-xun-lian-ying-yi-qi/ansible-jiao-cheng/README.md)
+  * [01- ansible 介绍](ping-tai-gong-cheng-xun-lian-ying-yi-qi/ansible-jiao-cheng/01-ansible-jie-shao.md)
 * [helm 教程](ping-tai-gong-cheng-xun-lian-ying-yi-qi/helm-jiao-cheng/README.md)
   * [01-快速入门](ping-tai-gong-cheng-xun-lian-ying-yi-qi/helm-jiao-cheng/01.md)
   * [02-如何使用](ping-tai-gong-cheng-xun-lian-ying-yi-qi/helm-jiao-cheng/02.md)
