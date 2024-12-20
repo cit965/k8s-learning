@@ -85,7 +85,7 @@ ansible myhosts -m ping -i inventory.ini
 
 随着托管节点数量的增加，yaml 格式更好。例如，以下内容与`inventory.ini`等效，它声明受管节点的唯一名称并使用`ansible_host`字段：
 
-```
+```yaml
 myhosts:
   hosts:
     my_host_01:
@@ -100,7 +100,7 @@ myhosts:
 
 组可以包含组，下面示例中 network 可以包含  leafs 和 spines
 
-```
+```yaml
 leafs:
   hosts:
     leaf01:
@@ -135,7 +135,7 @@ datacenter:
 
 ### 变量
 
-```
+```yaml
 webservers:
   hosts:
     webserver01:
@@ -154,7 +154,7 @@ Playbook 是`YAML`格式的自动化蓝图，Ansible 使用它来部署和配置
 
 以下示例创建一个 playbook，该 playbook 可以自动帮你 ping 主机并打印“Hello world”消息：
 
-```
+```yaml
 - name: My first play
   hosts: myhosts
   tasks:
