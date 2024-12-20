@@ -147,3 +147,29 @@ webservers:
   vars:
     ansible_user: my_server_user
 ```
+
+## playbook
+
+Playbook 是`YAML`格式的自动化蓝图，Ansible 使用它来部署和配置托管节点。
+
+以下示例创建一个 playbook，该 playbook 可以自动帮你 ping 主机并打印“Hello world”消息：
+
+```
+- name: My first play
+  hosts: myhosts
+  tasks:
+   - name: Ping my hosts
+     ansible.builtin.ping:
+
+   - name: Print message
+     ansible.builtin.debug:
+       msg: Hello world
+```
+
+你可以运行以下命令来执行你的 playbook
+
+```
+ansible-playbook -i inventory.ini playbook.yaml
+```
+
+<figure><img src="../../.gitbook/assets/1734681007364.png" alt=""><figcaption></figcaption></figure>
