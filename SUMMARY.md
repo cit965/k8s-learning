@@ -1,7 +1,8 @@
 # Table of contents
 
-* [k8s-learning](README.md)
-* [k8s 源码面试1000题](k8s-1000-question.md)
+* [k8s源码训练营](README.md)
+  * [k8s 源码面试题](readme/k8s-1000-question.md)
+  * [在 k8s 上部署应用](readme/1-zai-k8s-shang-bu-shu-ying-yong.md)
 
 ## k8s源码人才孵化训练营
 
@@ -65,15 +66,6 @@
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
 * [第十一章：gpu](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-shi-yi-zhang-gpu/README.md)
   * [在 k8s 上安装 gpu](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-shi-yi-zhang-gpu/zai-k8s-shang-an-zhuang-gpu.md)
-
-## 开发者要懂的 k8s
-
-* [1 在 k8s 上部署应用](kai-fa-zhe-yao-dong-de-k8s/1-zai-k8s-shang-bu-shu-ying-yong.md)
-
-## k8s源码每日新闻
-
-* [2024-9-13](k8s-yuan-ma-mei-ri-xin-wen/2024-9-13.md)
-* [2024-9-14](k8s-yuan-ma-mei-ri-xin-wen/2024-9-14.md)
 
 ## 平台工程训练营一期
 

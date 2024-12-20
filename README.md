@@ -1,30 +1,28 @@
-# k8s-learning
+# k8s源码训练营
 
 ## 我们是谁
 
-我们是中国最大的 k8s 开源人才孵化社区，旨在帮助小伙伴熟悉源码和贡献流程。
+我们是中国最大的 k8s 人才孵化社区，旨在帮助大家熟悉  k8s 源码，参与云原生社区。
 
 ## 学习目标
 
-* 熟练使用 k8s
-* 能够从源码级别理解 k8s
-* 能够给官方仓库提交 pr
+* 熟练使用 k8s，掌握k8s核心概念
+* 对于k8s有源码级别的理解
+* 给官方仓库提交 pr，成为维护者
 
 ## 组织形式
 
-* 源码训练营+社群交流
-* 周日晚 20：00 交流会
+* 源码训练营 + 社群交流
+* 每周日晚上9点直播
 
 ## 目前课程
 
-* k8s 1000 个面试题
-  * [链接](k8s-1000-question.md)
 * k8s 训练营入门：
   * https://space.bilibili.com/28187952/channel/collectiondetail?sid=2269587
 * k8s cka
   * https://space.bilibili.com/28187952/channel/collectiondetail?sid=2177919
 * k8s 源码
-  * 抖音课堂(付费)
+  * 付费课程，需要可以咨询
 
 ## 招聘
 
@@ -35,28 +33,5 @@
 
 ## 联系方式
 
-可以加v: nangework
+可以加微信: nangework
 
-## k8s 大佬 twitter
-
-https://twitter.com/thockin
-
-https://twitter.com/smarterclayton
-
-https://twitter.com/originalavalamp
-
-https://twitter.com/bgrant0607
-
-https://twitter.com/vishnukanan
-
-https://twitter.com/the\_saad\_ali
-
-https://twitter.com/kelseyhightower
-
-https://twitter.com/jbeda
-
-https://twitter.com/brendandburns
-
-https://twitter.com/michellenoorali
-
-https://twitter.com/kubeweekly
