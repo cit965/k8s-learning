@@ -23,13 +23,28 @@ Kubespray 是一个开源项目，旨在帮助用户在多云环境中部署和�
 
 ### 安装
 
-#### 克隆代码
+#### 1. 设置免密登录
+
+首先在你的 Ansible 节点上为你的本地用户生成 SSH 密钥：
+
+```
+$ ssh-keygen
+```
+
+使用 `ssh-copy-id` 命令复制 SSH 密钥：
+
+```
+$ ssh-copy-id -i ~/.ssh/{rsa.pub} {username}@{192.168.1.241}
+$ ssh-copy-id -i ~/.ssh/{rsa.pub} {username}@{192.168.1.242}
+```
+
+#### 2. 克隆代码
 
 ```
 git clone git@github.com:kubernetes-sigs/kubespray.git
 ```
 
-#### 安装 ansible
+#### 3. 安装 ansible
 
 需要提前安装下 python 和 pip ， 以下命令主要是创建一个 python 虚拟环境，并安装依赖，复制命令执行即可
 
@@ -56,3 +71,26 @@ cp -r inventory/sample inventory/mycluster
 
 <figure><img src="../../.gitbook/assets/1734748395130.png" alt=""><figcaption></figcaption></figure>
 
+### 安装集群
+
+```
+ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml -b -v \
+  --private-key=~/.ssh/private_key -u xx -e ansible_become_pass=xxxx
+```
+
+### 访问集群
+
+`kubectl_localhost: true`和`kubeconfig_localhost: true`&#x20;
+
+如果启用了`kubectl_localhost` ， `kubectl`将下载到`/usr/local/bin/`，还会生成一个`inventory/mycluster/artifacts/kubectl.sh` 脚本
+
+如果`kubeconfig_localhost`启用了`admin.conf`会出现在 `inventory/mycluster/artifacts/`
+
+注意：admin.conf 文件中的控制器主机名可能是私有 IP。如果是这样，请将其更改为使用控制器的公共 IP 或集群的负载均衡器。&#x20;
+
+您可以通过运行以下命令查看节点列表：
+
+```
+cd inventory/mycluster/artifacts
+./kubectl.sh get nodes
+```
