@@ -10,7 +10,7 @@
    * `kubeadm`是Kubernetes官方提供的工具，用于快速搭建生产级别的Kubernetes集群。它简化了初始化Master节点以及加入Worker节点的过程，可以方便地创建一个最小化的高可用集群。
 3. **第三方自动化部署工具**
    * Kubespray（Ansible playbook驱动的部署工具）：通过Ansible Playbooks自动化执行一系列步骤来部署Kubernetes集群，适用于生产环境，可以高度定制化
-   * kubekey: 不使用 ansible，直接使用go语言编写的部署工具，对于国内用户比较友好，安装方便
+   * kubekey: 不使用 ansible，直接使用go语言编写的部署工具，对于国内用户比较友好，安装方便（个人推荐）
 
 ## Kubespray
 
@@ -96,3 +96,19 @@ cd inventory/mycluster/artifacts
 ./kubectl.sh get nodes
 ```
 
+## kubekey
+
+### 介绍
+
+KubeKey是一个开源的轻量级工具，用于部署Kubernetes集群。它提供了一种灵活、快速、方便的方式来安装Kubernetes/K3s、Kubernetes/K3s和KubeSphere，以及相关的云原生附加组件。它也是扩展和升级集群的有效工具。
+
+此外，KubeKey还支持定制离线包（artifact），方便用户在离线环境下快速部署集群。
+
+### 安装
+
+1. 修改主机 /etc/hosts ,添加主机名
+2. 在安装必要组件
+
+```
+// S
+```
