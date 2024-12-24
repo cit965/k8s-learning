@@ -120,7 +120,7 @@ sudo vim /etc/hosts
 2. 在安装必要组件
 
 ```
-apt install -y socat conntrack ebtables ipset ipvsam
+apt install -y socat conntrack ebtables ipset ipvsadm
 ```
 
 3. 下载 kk 工具
