@@ -138,6 +138,6 @@ curl -sfL https://get-kk.kubesphere.io | sh -
 5. 修改 config
 6. 创建集群
 
-```
-./kk create config -f config.yaml
-```
+<pre><code>export KKZONE=cn
+<strong>./kk create config -f config.yaml
+</strong></code></pre>
