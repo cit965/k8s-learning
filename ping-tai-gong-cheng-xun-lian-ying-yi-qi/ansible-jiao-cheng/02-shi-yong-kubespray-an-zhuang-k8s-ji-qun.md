@@ -9,7 +9,8 @@
 2. **kubeadm部署**
    * `kubeadm`是Kubernetes官方提供的工具，用于快速搭建生产级别的Kubernetes集群。它简化了初始化Master节点以及加入Worker节点的过程，可以方便地创建一个最小化的高可用集群。
 3. **第三方自动化部署工具**
-   * Kubespray（Ansible playbook驱动的部署工具）：通过Ansible Playbooks自动化执行一系列步骤来部署Kubernetes集群，适用于生产环境，方便快捷。
+   * Kubespray（Ansible playbook驱动的部署工具）：通过Ansible Playbooks自动化执行一系列步骤来部署Kubernetes集群，适用于生产环境，可以高度定制化
+   * kubekey: 不使用 ansible，直接使用go语言编写的部署工具，对于国内用户比较友好，安装方便
 
 ## Kubespray
 
@@ -94,3 +95,4 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml -b -v \
 cd inventory/mycluster/artifacts
 ./kubectl.sh get nodes
 ```
+
