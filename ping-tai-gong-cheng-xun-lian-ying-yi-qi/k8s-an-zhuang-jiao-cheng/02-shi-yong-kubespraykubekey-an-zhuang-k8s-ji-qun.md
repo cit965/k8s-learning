@@ -1,4 +1,4 @@
-# 02-使用 kubespray安装 k8s集群
+# 02-使用 kubespray、kubekey安装 k8s集群
 
 ## &#x20;常见集群部署方式
 
@@ -107,8 +107,37 @@ KubeKey是一个开源的轻量级工具，用于部署Kubernetes集群。它提
 ### 安装
 
 1. 修改主机 /etc/hosts ,添加主机名
+
+```
+// 假设我们有两台机器，分别叫做node1，node2, 我们需要修改 hosts 文件
+sudo vim /etc/hosts
+
+
+192.168.3.121 node1
+192.168.3.122 node2
+```
+
 2. 在安装必要组件
 
 ```
-// S
+apt install -y socat conntrack ebtables ipset ipvsam
+```
+
+3. 下载 kk 工具
+
+```
+curl -sfL https://get-kk.kubesphere.io | sh -
+```
+
+4. 创建 config
+
+```
+./kk create config
+```
+
+5. 修改 config
+6. 创建集群
+
+```
+./kk create config -f config.yaml
 ```

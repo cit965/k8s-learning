@@ -69,9 +69,9 @@
 
 ## 平台工程训练营一期
 
-* [ansible 教程](ping-tai-gong-cheng-xun-lian-ying-yi-qi/ansible-jiao-cheng/README.md)
-  * [01- ansible 介绍](ping-tai-gong-cheng-xun-lian-ying-yi-qi/ansible-jiao-cheng/01-ansible-jie-shao.md)
-  * [02-使用 kubespray安装 k8s集群](ping-tai-gong-cheng-xun-lian-ying-yi-qi/ansible-jiao-cheng/02-shi-yong-kubespray-an-zhuang-k8s-ji-qun.md)
+* [k8s 安装教程](ping-tai-gong-cheng-xun-lian-ying-yi-qi/k8s-an-zhuang-jiao-cheng/README.md)
+  * [01- ansible 介绍](ping-tai-gong-cheng-xun-lian-ying-yi-qi/k8s-an-zhuang-jiao-cheng/01-ansible-jie-shao.md)
+  * [02-使用 kubespray、kubekey安装 k8s集群](ping-tai-gong-cheng-xun-lian-ying-yi-qi/k8s-an-zhuang-jiao-cheng/02-shi-yong-kubespraykubekey-an-zhuang-k8s-ji-qun.md)
 * [helm 教程](ping-tai-gong-cheng-xun-lian-ying-yi-qi/helm-jiao-cheng/README.md)
   * [01-快速入门](ping-tai-gong-cheng-xun-lian-ying-yi-qi/helm-jiao-cheng/01.md)
   * [02-如何使用](ping-tai-gong-cheng-xun-lian-ying-yi-qi/helm-jiao-cheng/02.md)
