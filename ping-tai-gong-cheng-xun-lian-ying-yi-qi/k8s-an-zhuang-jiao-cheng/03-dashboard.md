@@ -45,8 +45,10 @@ kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy
 
 我们首先新建一个 sc.yaml ，将下面内容复制进去
 
-<pre class="language-yaml"><code class="lang-yaml"><strong>apiVersion: v1
-</strong>kind: ServiceAccount
+````yaml
+```yaml
+apiVersion: v1
+kind: ServiceAccount
 metadata:
   name: admin-user
   namespace: kubernetes-dashboard
@@ -64,7 +66,8 @@ subjects:
   - kind: ServiceAccount
     name: admin-user
     namespace: kubernetes-dashboard
-</code></pre>
+```
+````
 
 执行以下命令，控制台会输出 token ，这里我添加了 duration 参数，作用是将 token 过期时间设置长一点，你可以根据自身情况设置，如果是自己玩，那就设置长一点 。
 
