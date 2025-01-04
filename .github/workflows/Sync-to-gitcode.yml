@@ -1,0 +1,23 @@
+name: Sync To Gitee
+
+on: # 这里是github action的触发条件
+  schedule:
+    - cron: '0 0 * * *' # 每日24点进行同步
+  push:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Sync yourreponame to Gitee
+        uses: wearerequired/git-mirror-action@master
+        env:
+          # 注意在 Settings->Secrets 配置 GITEE_RSA_PRIVATE_KEY
+          SSH_PRIVATE_KEY: ${{ secrets.GITCODE_RSA_PRIVATE_KEY }}
+        with:
+          # 注意替换为你的 GitHub 源仓库地址
+          source-repo: git@github.com:cit965/k8s-learning.git
+          # 注意替换为你的 Gitee 目标仓库地址
+          destination-repo: git@gitcode.com:mouuii/k8s-learning.git
