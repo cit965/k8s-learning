@@ -48,3 +48,44 @@ K3s 服务器需要端口 6443 才能被所有节点访问。安装不同的网�
 | UDP        | 51821     | All nodes   | All nodes    | <p><br>仅适用于具有 IPv6 的 Flannel Wireguard</p>                              |
 | TCP        | 5001      | All nodes   | All nodes    | <p><br>仅嵌入式分布式注册表 (Spegel) 需要</p>                                       |
 | TCP        | 6443      | All nodes   | All nodes    | <p><br>仅嵌入式分布式注册表 (Spegel) 需要</p>                                       |
+
+## 配置
+
+默认情况下，安装时将使用位于`/etc/rancher/k3s/config.yaml`的 YAML 文件中存在的值。
+
+基本`server`配置文件的示例如下：
+
+```yaml
+write-kubeconfig-mode: "0644"
+tls-san:
+  - "foo.local"
+node-label:
+  - "foo=bar"
+  - "something=amazing"
+cluster-init: true
+```
+
+这相当于以下 CLI 参数：
+
+```bash
+k3s server \
+  --write-kubeconfig-mode "0644"    \
+  --tls-san "foo.local"             \
+  --node-label "foo=bar"            \
+  --node-label "something=amazing"  \
+  --cluster-init
+```
+
+## 卸载
+
+要从 server 节点卸载 K3s，请运行：
+
+```bash
+/usr/local/bin/k3s-uninstall.sh
+```
+
+要从 agent 节点卸载 K3s，请运行：
+
+```bash
+/usr/local/bin/k3s-agent-uninstall.sh
+```
