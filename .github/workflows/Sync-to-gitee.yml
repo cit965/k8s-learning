@@ -2,7 +2,7 @@ name: Sync To Gitee
 
 on: # 这里是github action的触发条件
   schedule:
-    - cron: '0 8 * * *' # 每日24点进行同步
+    - cron: '0 0 * * *' # 每日24点进行同步
   push:
   delete:
   create:
