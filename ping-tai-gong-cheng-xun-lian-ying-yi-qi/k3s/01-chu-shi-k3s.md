@@ -29,3 +29,22 @@ curl -sfL https://get.k3s.io | K3S_URL=https://myserver:6443 K3S_TOKEN=mynodetok
 
 <figure><img src="../../.gitbook/assets/1735978172814.png" alt=""><figcaption></figcaption></figure>
 
+安装 k3s 的最低硬件要求如下：
+
+| Node  节点    | CPU | RAM     |
+| ----------- | --- | ------- |
+| Server  服务器 | 2核  | 2 GB    |
+| Agent  代理   | 1 核 | 512 MB  |
+
+K3s 服务器需要端口 6443 才能被所有节点访问。安装不同的网络插件会要求某些端口开放，如下：
+
+| Protocol   | Port      | Source      | Destination  | 描述                                                                      |
+| ---------- | --------- | ----------- | ------------ | ----------------------------------------------------------------------- |
+| TCP        | 2379-2380 | Servers  服  | Servers      | <p>Required only for HA with embedded etcd<br>仅对于具有嵌入式 etcd 的 HA 需要</p> |
+| TCP        | 6443      | Agents      | Servers      | <p><br>K3s Supervisor 和 Kubernetes API Server</p>                       |
+| UDP        | 8472      | All nodes   | All nodes    | <p><br>仅 Flannel VXLAN 需要</p>                                           |
+| TCP        | 10250     | All nodes   | All nodes    | Kubelet metrics                                                         |
+| UDP        | 51820     | All nodes   | All nodes    | <p><br>仅适用于具有 IPv4 的 Flannel Wireguard</p>                              |
+| UDP        | 51821     | All nodes   | All nodes    | <p><br>仅适用于具有 IPv6 的 Flannel Wireguard</p>                              |
+| TCP        | 5001      | All nodes   | All nodes    | <p><br>仅嵌入式分布式注册表 (Spegel) 需要</p>                                       |
+| TCP        | 6443      | All nodes   | All nodes    | <p><br>仅嵌入式分布式注册表 (Spegel) 需要</p>                                       |
