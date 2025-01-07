@@ -90,6 +90,7 @@
   * [06、 Jenkins CI/CD 管道实战2 【go-主机】](ping-tai-gong-cheng-xun-lian-ying-yi-qi/jenkins-jiao-cheng/06-jenkins-cicd-guan-dao-shi-zhan-2-go-zhu-ji.md)
 * [k3s](ping-tai-gong-cheng-xun-lian-ying-yi-qi/k3s/README.md)
   * [01-初识k3s](ping-tai-gong-cheng-xun-lian-ying-yi-qi/k3s/01-chu-shi-k3s.md)
+  * [02-使用 K3s 和 MetalLB 从头开始​​构建 Kubernetes 集群](ping-tai-gong-cheng-xun-lian-ying-yi-qi/k3s/02-shi-yong-k3s-he-metallb-cong-tou-kai-shi-gou-jian-kubernetes-ji-qun.md)
 
 ## 编程语言
 
