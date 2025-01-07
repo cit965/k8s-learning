@@ -80,7 +80,22 @@ k3s server \
 
 1. 准备集群所需镜像压缩包，可以到 github release 页面下载
 2. 将 k3s 二进制和 install.sh 脚本下载到本地
-3. 执行安装命令
+3. 执行安装命令&#x20;
+
+我写了个脚本给你参考,：
+
+```bash
+mkdir -p /var/lib/rancher/k3s/agent/images/
+curl -L -o /var/lib/rancher/k3s/agent/images/k3s-airgap-images-amd64.tar.zst "https://github.com/k3s-io/k3s/releases/download/v1.31.4%2Bk3s1/k3s-airgap-images-amd64.tar.zst"
+curl -L -o /usr/local/bin/k3s https://github.com/k3s-io/k3s/releases/download/v1.31.4%2Bk3s1/k3s
+chmod +x /usr/local/bin/k3s
+
+curl https://raw.githubusercontent.com/k3s-io/k3s/refs/tags/v1.31.4%2Bk3s1/install.sh > install.sh
+chmod +x install.sh
+INSTALL_K3S_SKIP_DOWNLOAD=true ./install.sh
+```
+
+
 
 ## 卸载
 
