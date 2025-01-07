@@ -76,6 +76,12 @@ k3s server \
   --cluster-init
 ```
 
+## 离线安装
+
+1. 准备集群所需镜像压缩包，可以到 github release 页面下载
+2. 将 k3s 二进制和 install.sh 脚本下载到本地
+3. 执行安装命令
+
 ## 卸载
 
 要从 server 节点卸载 K3s，请运行：
