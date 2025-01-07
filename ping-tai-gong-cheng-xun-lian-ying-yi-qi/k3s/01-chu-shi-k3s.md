@@ -82,7 +82,7 @@ k3s server \
 2. 将 k3s 二进制和 install.sh 脚本下载到本地
 3. 执行安装命令&#x20;
 
-我写了个脚本给你参考,：
+我写了个脚本给你参考,将依赖下载下来后，放入指定目录就可以离线安装：
 
 ```bash
 mkdir -p /var/lib/rancher/k3s/agent/images/
