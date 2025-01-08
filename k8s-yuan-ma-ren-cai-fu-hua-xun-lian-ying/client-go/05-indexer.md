@@ -307,7 +307,7 @@ Indices: {
 }
 ```
 
-<figure><img src="../../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 了解了底层数据接口，我们再回过头来看看其暴露给外部的方法：
 

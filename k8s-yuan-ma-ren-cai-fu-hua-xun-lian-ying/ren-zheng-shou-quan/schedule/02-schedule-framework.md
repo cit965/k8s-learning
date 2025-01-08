@@ -22,7 +22,7 @@ _scheduling framework_  是 Kubernetes 调度器的可插拔架构，它由一�
 
 下图展示了Pod的调度上下文以及调度框架暴露的接口。
 
-<figure><img src="../../../.gitbook/assets/image (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (6) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### PreEnqueue
 
