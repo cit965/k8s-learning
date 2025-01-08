@@ -66,6 +66,9 @@
   * [01-认证](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/01-ren-zheng.md)
 * [第十一章：gpu](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-shi-yi-zhang-gpu/README.md)
   * [在 k8s 上安装 gpu](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-shi-yi-zhang-gpu/zai-k8s-shang-an-zhuang-gpu.md)
+* [Kep](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/README.md)
+  * [sig-api-machinery](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/README.md)
+    * [1601-k8s.io/client-go 中的 context 支持](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/1601k8s.ioclientgo-zhong-de-context-zhi-chi.md)
 
 ## 平台工程训练营一期
 
