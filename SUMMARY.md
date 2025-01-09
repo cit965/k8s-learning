@@ -43,7 +43,7 @@
   * [4.13 daemonset controller源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.13-daemonset-controller-yuan-ma-fen-xi.md)
   * [4.16 k8s GC](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/controller-manager/4.16-k8s-gc.md)
 * [第五章： apiserver 源码解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/README.md)
-  * [5.1 核心数据结构分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.1-k8s-he-xin-shu-ju-jie-gou-fen-xi.md)
+  * [5.1 什么是 k8s 资源](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.1-k8s-he-xin-shu-ju-jie-gou-fen-xi.md)
   * [5.2 apimachinery 初识](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.2-shen-me-shi-apimachinery.md)
   * [5.3 api-conventions（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.2-api-conventions.md)
   * [5.6 服务端和客户端 apply](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.6-fu-wu-duan-he-ke-hu-duan-apply.md)
@@ -108,3 +108,7 @@
 ## 变现
 
 * [01-2025年技术人如何变现](bian-xian/012025-nian-ji-shu-ren-ru-he-bian-xian.md)
+
+## AI 讲 k8s 源码
+
+* [delta\_fifo](ai-jiang-k8s-yuan-ma/delta_fifo.md)
