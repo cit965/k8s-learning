@@ -20,7 +20,7 @@ Kubespray 是一个开源项目，旨在帮助用户在多云环境中部署和�
 
 使用 Kubespray，用户可以选择执行一个 Ansible 脚本，然后 Ansible 会使用 SSH 协议与各个目标主机进行通信，并基于该脚本实现集群部署、清理、升级等任务。
 
-<figure><img src="../../.gitbook/assets/image (13).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (6).png" alt=""><figcaption></figcaption></figure>
 
 ### 安装
 
