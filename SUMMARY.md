@@ -45,13 +45,11 @@
 * [第五章： apiserver 源码解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/README.md)
   * [5.1 什么是 k8s 资源](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.1-k8s-he-xin-shu-ju-jie-gou-fen-xi.md)
   * [5.2 初识 kube-apiserver](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.2-shen-me-shi-apimachinery.md)
-  * [5.3 api-conventions（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.2-api-conventions.md)
   * [5.6 服务端和客户端 apply](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.6-fu-wu-duan-he-ke-hu-duan-apply.md)
   * [5.7 pod 生命周期和 conditions 浅析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.7-pod-sheng-ming-zhou-qi-he-conditions-qian-xi.md)
   * [5.8 event 源码解析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.8-event-yuan-ma-jie-xi.md)
   * [5.10 API 组和版本控制初探](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.10-api-zu-he-ban-ben-kong-zhi-chu-tan.md)
   * [5.11 scheme 初识](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.11-scheme-chu-shi.md)
-  * [5.12 k8s api-changes（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.12-k8s-apichanges-fan-yi.md)
   * [5.13 序列化器与序列化器工厂](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.13-xu-lie-hua-qi-yu-xu-lie-hua-qi-gong-chang.md)
   * [5.14 序列化器与序列化器工厂2](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.14-xu-lie-hua-qi-yu-xu-lie-hua-qi-gong-chang-2.md)
   * [5.15 序列化器与序列化工厂3](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.15-xu-lie-hua-qi-yu-xu-lie-hua-gong-chang-3.md)
@@ -68,7 +66,9 @@
   * [在 k8s 上安装 gpu](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-shi-yi-zhang-gpu/zai-k8s-shang-an-zhuang-gpu.md)
 * [Kep](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/README.md)
   * [sig-api-machinery](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/README.md)
+    * [5.12 k8s api-changes（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/5.12-k8s-apichanges-fan-yi.md)
     * [1601-k8s.io/client-go 中的 context 支持](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/1601k8s.ioclientgo-zhong-de-context-zhi-chi.md)
+    * [5.3 api-conventions（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/5.2-api-conventions.md)
 
 ## 平台工程训练营一期
 
