@@ -8,7 +8,7 @@
 
 当前容器产品在企业中的使用已经非常普遍，对于运维和开发团队而言，熟练掌握容器技术的使用也成为一门必不可少的技能。
 
-<figure><img src="../../.gitbook/assets/image (1) (1).png" alt="" width="563"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (6).png" alt="" width="563"><figcaption></figcaption></figure>
 
 ## Docker desktop
 
@@ -36,7 +36,7 @@ cd welcome-to-docker
 
 在你的 IDE 中打开示例应用程序。注意它已经有一个 **Dockerfile**。对于你自己的项目，你需要自己创建这个文件。
 
-<figure><img src="../../.gitbook/assets/image (2) (1).png" alt="" width="474"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (7).png" alt="" width="474"><figcaption></figcaption></figure>
 
 你可以使用以下 **docker build** 命令通过 CLI 在你的项目文件夹中构建一个镜像。
 

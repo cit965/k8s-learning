@@ -12,7 +12,7 @@
 
 下面 `sharedIndexInformer` 简化的实现原理架构图.
 
-<figure><img src="../../.gitbook/assets/image (5) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (35).png" alt=""><figcaption></figcaption></figure>
 
 那 sharedIndexInformer 如何去通知多个 控制器呢？ 这里就用到了 shareProcessor
 

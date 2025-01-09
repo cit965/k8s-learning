@@ -8,13 +8,13 @@ Operator 是 Kubernetes 用来拓展其 API 的一种开发范式（Pattern）�
 
 controller-runtime 这个包的内容不少，为了在一篇文章里能覆盖到，本文仅选取在构建 Operator 过程中起关键作用的包进行介绍，`envtest`、`scheme`、`certwatcher` 等同样重要的包就不在此提及。下面是我读代码时画的意识流思维导图，有的子项目是组成结构，有的子项目是工作角色，比较自由灵活。我选取了 `Cache`,`Source`, `Handler`, `Client`, `Controller` 和 `Manager` 这六个包
 
-<figure><img src="../../.gitbook/assets/image (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (41).png" alt=""><figcaption></figcaption></figure>
 
 ## WorkFlow
 
 对于控制器而言，资源发生变动的信息均来自于 API Server，从资源发生变动到控制器完成调解需要经过多个模块的处理，大体来说可以用下面的图来表示。
 
-<figure><img src="../../.gitbook/assets/image (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (42).png" alt=""><figcaption></figcaption></figure>
 
 ## Cache <a href="#cache" id="cache"></a>
 

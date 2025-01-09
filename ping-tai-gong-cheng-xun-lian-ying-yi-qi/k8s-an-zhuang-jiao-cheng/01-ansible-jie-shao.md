@@ -11,7 +11,7 @@ Ansible 提供开源自动化方案。使用简单的、人类可读的脚本（
 
 ## &#x20;架构图
 
-<figure><img src="../../.gitbook/assets/image (36).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (66).png" alt=""><figcaption></figcaption></figure>
 
 如上图所示，大多数 Ansible 环境都包含三个主要组件：
 

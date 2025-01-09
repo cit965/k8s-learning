@@ -12,7 +12,7 @@ Kubernetes Dashboard 是一个通用的、基于 Web 的 UI，适用于 Kubernet
 As of version 7.0.0, we have dropped support for Manifest-based installation. Only Helm-based installation is supported now. Due to multi-container setup and hard dependency on Kong gateway API proxy it would not be feasible to easily support Manifest-based installation.\
 从版本 7.0.0 开始，我们放弃了对基于清单的安装的支持。目前仅支持基于 Helm 的安装。由于多容器设置和对 Kong 网关 API 代理的硬依赖，轻松支持基于清单的安装是不可行的。
 
-<figure><img src="../../.gitbook/assets/image (37).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (67).png" alt=""><figcaption></figcaption></figure>
 
 ## 安装
 

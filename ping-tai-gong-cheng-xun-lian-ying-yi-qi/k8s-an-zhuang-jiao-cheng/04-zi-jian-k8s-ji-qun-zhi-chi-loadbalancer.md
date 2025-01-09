@@ -30,7 +30,7 @@ spec:
 
 `kubectl port-forward` 是 Kubernetes 命令行工具 kubectl 提供的一个功能，用于在本地主机和 Kubernetes 集群中的 Pod 之间建立端口转发。
 
-<figure><img src="../../.gitbook/assets/image (38).png" alt="" width="375"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (68).png" alt="" width="375"><figcaption></figcaption></figure>
 
 当你运行 kubectl port-forward 命令时，它会将本地主机上的一个端口与 Kubernetes 集群中的一个 Pod 的端口进行绑定。这样，在本地主机上监听的端口上收到的流量将被转发到 Pod 的端口上。
 
@@ -64,7 +64,7 @@ spec:
 
 NodePort服务是让外部流量直接访问服务的最原始方式。NodePort，顾名思义，在所有的节点（虚拟机）上开放指定的端口，所有发送到这个端口的流量都会直接转发到服务。
 
-<figure><img src="../../.gitbook/assets/image (39).png" alt="" width="375"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (69).png" alt="" width="375"><figcaption></figcaption></figure>
 
 NodePort服务的YAML文件如下：
 
@@ -125,7 +125,7 @@ Ingress 可以在多个服务前面充当“智能路由”的角色，或者是
 
 默认的 GKE ingress控制器会启动一个 Load Balancer，管理员基于路径或者是基于子域名的方式可以配置流量路由到不同的后端服务，如下图：
 
-<figure><img src="../../.gitbook/assets/image (40).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (70).png" alt=""><figcaption></figcaption></figure>
 
 一个最小的 Ingress 资源示例：
 

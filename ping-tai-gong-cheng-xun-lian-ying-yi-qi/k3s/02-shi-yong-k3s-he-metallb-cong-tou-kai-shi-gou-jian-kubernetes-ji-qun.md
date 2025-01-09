@@ -10,7 +10,7 @@ Kubernetes 是一个由 Google 最初开发的开源项目。它用于容器编�
 
 在运行 Kubernetes 集群之前，你需要有节点或服务器来安装 Kubernetes 软件。我的桌面运行在 Windows 上，所以我使用 [Hyper-V](https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/about/) 来创建虚拟机以托管集群。我的集群有四台虚拟机；一个控制节点和三个工作节点，它们都在同一个网络中运行 K3S。虚拟机位于一个 /24 网络中，DHCP 和 DNS 由 dnsmasq 管理。下面的图片展示了我当前的集群配置：
 
-<figure><img src="../../.gitbook/assets/image (41).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (71).png" alt=""><figcaption></figcaption></figure>
 
 对于服务器的基本操作系统，我选择了我偏好的操作系统；Ubuntu Server。每台服务器都有 4GB 的内存、24GB 的磁盘和一个静态 IP。
 
@@ -54,7 +54,7 @@ ufw allow from 10.43.0.0/16 to any #services
 
 安装完一切后，我的四节点集群就运行起来了。下面的图片展示了运行 `kubectl get nodes` 命令的输出，该命令显示了 Kubernetes 集群的健康和状态。有三个工作节点和一个主节点。
 
-<figure><img src="../../.gitbook/assets/image (42).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (72).png" alt=""><figcaption></figcaption></figure>
 
 ## 部署应用程序
 
@@ -184,7 +184,7 @@ Kubernetes 没有为裸机集群提供网络负载均衡器。要在像 AWS、Az
 
 下面的图片展示了 MetalLB 的工作方式。当请求 LoadBalancer 服务时，MetalLB 会从配置的范围中分配一个 IP 地址，并使网络知道该 IP“位于”集群中：
 
-<figure><img src="../../.gitbook/assets/image (43).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (73).png" alt=""><figcaption></figcaption></figure>
 
 ### 安装 MetalLB
 
