@@ -104,3 +104,7 @@
 * [c#入门](bian-cheng-yu-yan/c-ru-men/README.md)
   * [01、c# 之旅](bian-cheng-yu-yan/c-ru-men/01c-zhi-l.md)
   * [02、VScode编辑器上编译C#](bian-cheng-yu-yan/c-ru-men/02vscode-bian-ji-qi-shang-bian-yi-c.md)
+
+## 变现
+
+* [01-2025年技术人如何变现](bian-xian/012025-nian-ji-shu-ren-ru-he-bian-xian.md)
