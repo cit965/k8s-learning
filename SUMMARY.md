@@ -105,10 +105,15 @@
   * [01、c# 之旅](bian-cheng-yu-yan/c-ru-men/01c-zhi-l.md)
   * [02、VScode编辑器上编译C#](bian-cheng-yu-yan/c-ru-men/02vscode-bian-ji-qi-shang-bian-yi-c.md)
 
+***
+
+* [软件推广](ruan-jian-tui-guang/README.md)
+  * [01-运行在 docker 中的 windows](ruan-jian-tui-guang/01-yun-xing-zai-docker-zhong-de-windows.md)
+
 ## 变现
 
 * [01-2025年技术人如何变现](bian-xian/012025-nian-ji-shu-ren-ru-he-bian-xian.md)
 
 ## AI 讲 k8s 源码
 
-* [delta\_fifo](ai-jiang-k8s-yuan-ma/delta_fifo.md)
+* [k8s 之父教你使用 AI 二次开发 k8s](ai-jiang-k8s-yuan-ma/k8s-zhi-fu-jiao-ni-shi-yong-ai-er-ci-kai-fa-k8s.md)

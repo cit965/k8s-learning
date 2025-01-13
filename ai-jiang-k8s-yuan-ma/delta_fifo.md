@@ -1,2 +1,0 @@
-# delta\_fifo
-
