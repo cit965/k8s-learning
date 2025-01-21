@@ -8,7 +8,8 @@
 
 * [第零章 ：阅读源码必知必会](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/README.md)
   * [window 调试k8s 源码](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/window-tiao-shi-k8s-yuan-ma.md)
-  * [01-调试开发k8s](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/01-tiao-shi-kai-fa-k8s.md)
+  * [01-本地调试开发k8s](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/01-tiao-shi-kai-fa-k8s.md)
+  * [02-借助minikube调试源码](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/02-jie-zhu-minikube-tiao-shi-yuan-ma.md)
   * [02- 当你运行 kubectl create deployment 命令时发生了什么](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/k8s-yuan-ma-kai-fa-bi-zhi-bi-hui/02-dang-ni-yun-xing-kubectl-create-deployment-ming-ling-shi-fa-sheng-le-shen-me.md)
 * [第一章： client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/README.md)
   * [01-client-go](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/client-go/01-client-go.md)
