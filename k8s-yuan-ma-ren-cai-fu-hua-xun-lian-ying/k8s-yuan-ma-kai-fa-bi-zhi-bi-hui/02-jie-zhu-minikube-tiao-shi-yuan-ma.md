@@ -1,25 +1,66 @@
 ---
-description: 本节给大家介绍在 linux 环境下如何开发调试 k8s源码，写下这篇文章的时候，k8s 最新的版本是 1
+description: 本节给大家介绍在 linux 环境下如何开发调试 k8s源码，写下这篇文章的时候，k8s 最新的版本是 1.32.0
 ---
 
 # 02-借助minikube调试源码
 
-### 1. 安装 go 语言
+## 1. 安装 go 语言
 
 <figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
-### 2. 安装 goland
+## 2. 安装 goland
 
+<figure><img src="../../.gitbook/assets/image (59).png" alt=""><figcaption></figcaption></figure>
 
-
-### 3. 下载  k8s 源码
+## 3.下载  k8s 源码
 
 `git clone https://github.com/kubernetes/kubernetes.git`
 
-### 1. 启动 minikube
+## 4. 启动 minikube
 
 ```
 minikube start --container-runtime=docker --image-mirror-country='cn'  --kubernetes-version=v1.32.0
 ```
 
-其中 `--kubernetes-version` 可以选择其他版本，我这里用的是 `v1.32.0`
+## 5.停止 kube-scheduler 服务
+
+### 1） 进入到 Minikube 容器
+
+`docker exec -it minikube bash`
+
+<figure><img src="../../.gitbook/assets/image (60).png" alt=""><figcaption></figcaption></figure>
+
+### 2)    查看 kube-scheduler 启动命令
+
+`ps -ef | grep scheduler`&#x20;
+
+<figure><img src="../../.gitbook/assets/image (65).png" alt=""><figcaption></figcaption></figure>
+
+kube-scheduler 启动只依赖了一个配置文件，我们将配置文件复制到宿主机源码目录下,将启动参数复制到goland编辑器中：
+
+<figure><img src="../../.gitbook/assets/image (62).png" alt=""><figcaption></figcaption></figure>
+
+### 3） 修改 scheduler.conf&#x20;
+
+kube-scheduler 启动需要连接 kube-apiserver ，这里宿主机 kube-apiserver 映射的端口是 32771，所以我们需要修改 scheduler.conf 中 server 地址 8443-> 32771
+
+<figure><img src="../../.gitbook/assets/image (63).png" alt=""><figcaption></figcaption></figure>
+
+<figure><img src="../../.gitbook/assets/image (64).png" alt=""><figcaption></figcaption></figure>
+
+### 4）移除 kube-scheduler
+
+`cd /etc/kubernetes`
+
+`manifests` 目录里存放着 K8s 所有的核心组件的 yaml 文件,因为我们要用自己本地的代码代替环境中的组件，所以环境里的组件要停止，让逻辑走到本地来。以 kube-scheduler 为例：
+
+`mv /etc/kubernetes/manifests/kube-scheduler.yaml /etc/kubernetes/kube-scheduler.yaml`
+
+一旦把 `kube-scheduler.yaml` 从 `manifests` 文件夹中移走，则 K8s 的 kube-schedueler pod 会删除。环境没有 kube-schedueler pod：
+
+<figure><img src="../../.gitbook/assets/image (61).png" alt=""><figcaption></figcaption></figure>
+
+### 5） 启动调试
+
+<figure><img src="../../.gitbook/assets/image (67).png" alt=""><figcaption></figcaption></figure>
+
