@@ -6,7 +6,7 @@ description: 本节给大家介绍在 linux 环境下如何开发调试 k8s源�
 
 ## 1. 安装 go 语言
 
-<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ## 2. 安装 goland
 
@@ -68,17 +68,17 @@ kube-scheduler 启动需要连接 kube-apiserver ，这里宿主机 kube-apiserv
 
 ### 1)  查看 kube-apiserver 启动参数
 
-<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### 2) 将配置文件拷贝到宿主机
 
 `sudo docker cp mibikube:/var/lib/mibikube /home/z/kubernetes/cmd/kube-apiserver/minikube`
 
-<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### 3) 修改启动参数
 
-<figure><img src="../../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 4\) etcd 端口转发
 
@@ -86,8 +86,13 @@ kube-scheduler 启动需要连接 kube-apiserver ，这里宿主机 kube-apiserv
 
 &#x20;
 
-5\)  修改 kubeconfig，指定 apiserver
+### 5)  修改 kubeconfig，指定 apiserver
 
-6\)  启动 apiserver ，打断点
+<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
-7\)  运行 kubectl get nodes, 断点生效
+### 6)  启动 apiserver ，打断点
+
+### 7)  运行 kubectl get nodes, 断点生效
+
+<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+
