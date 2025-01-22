@@ -93,7 +93,7 @@ Node affinity 通过更灵活的接口扩展了nodeSelector。您仍然可以告
 
 
 
-<figure><img src="../../../.gitbook/assets/image (2) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/image (2) (1) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 此外，Tolerations 可以通过三种效果来排斥 Pod：
 
