@@ -112,6 +112,7 @@
 
 * [软件推广](ruan-jian-tui-guang/README.md)
   * [01-运行在 docker 中的 windows](ruan-jian-tui-guang/01-yun-xing-zai-docker-zhong-de-windows.md)
+  * [02-AI 写代码写文章](ruan-jian-tui-guang/02ai-xie-dai-ma-xie-wen-zhang.md)
 
 ## 变现
 
