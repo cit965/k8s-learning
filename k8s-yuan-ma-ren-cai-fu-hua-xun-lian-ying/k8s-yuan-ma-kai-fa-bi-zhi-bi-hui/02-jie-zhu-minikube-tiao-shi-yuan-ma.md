@@ -24,7 +24,7 @@ minikube start --container-runtime=docker --image-mirror-country='cn'  --kuberne
 
 ## 5.调试 kube-scheduler 服务
 
-### ![](<../../.gitbook/assets/image (4).png>)1） 进入到 Minikube 容器
+### 1） 进入到 Minikube 容器
 
 `docker exec -it minikube bash`
 
@@ -76,13 +76,15 @@ kube-scheduler 启动需要连接 kube-apiserver ，这里宿主机 kube-apiserv
 
 <figure><img src="../../.gitbook/assets/image (2) (1).png" alt=""><figcaption></figcaption></figure>
 
-### 3) 修改启动参数
+### 3)  修改启动参数
 
 <figure><img src="../../.gitbook/assets/image (3) (1).png" alt=""><figcaption></figcaption></figure>
 
-4\) etcd 端口转发
+**4)  etcd 端口转发**
 
 `kubectl port-forward pods/etcd-minikube 2379:2379 -n kube-system`
+
+<figure><img src="../../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
 
 &#x20;
 
