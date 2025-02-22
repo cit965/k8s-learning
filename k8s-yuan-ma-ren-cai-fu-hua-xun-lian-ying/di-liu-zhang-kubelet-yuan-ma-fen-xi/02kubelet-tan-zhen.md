@@ -437,18 +437,56 @@ func (pb *prober) runProbeWithRetries(ctx context.Context, probeType probeType, 
 * gRPC 探测：检查 gRPC 服务状态
 
 ```go
-// runProbeWithRetries tries to probe the container in a finite loop, it returns the last result
-// if it never succeeds.
-func (pb *prober) runProbeWithRetries(ctx context.Context, probeType probeType, p *v1.Probe, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID kubecontainer.ContainerID, retries int) (probe.Result, string, error) {
-	var err error
-	var result probe.Result
-	var output string
-	for i := 0; i < retries; i++ {
-		result, output, err = pb.runProbe(ctx, probeType, p, pod, status, container, containerID)
-		if err == nil {
-			return result, output, nil
+func (pb *prober) runProbe(ctx context.Context, probeType probeType, p *v1.Probe, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID kubecontainer.ContainerID) (probe.Result, string, error) {
+	timeout := time.Duration(p.TimeoutSeconds) * time.Second
+	switch {
+	case p.Exec != nil:
+		klog.V(4).InfoS("Exec-Probe runProbe", "pod", klog.KObj(pod), "containerName", container.Name, "execCommand", p.Exec.Command)
+		command := kubecontainer.ExpandContainerCommandOnlyStatic(p.Exec.Command, container.Env)
+		return pb.exec.Probe(pb.newExecInContainer(ctx, container, containerID, command, timeout))
+
+	case p.HTTPGet != nil:
+		req, err := httpprobe.NewRequestForHTTPGetAction(p.HTTPGet, &container, status.PodIP, "probe")
+		if err != nil {
+			// Log and record event for Unknown result
+			klog.V(4).InfoS("HTTP-Probe failed to create request", "error", err)
+			return probe.Unknown, "", err
 		}
+		if klogV4 := klog.V(4); klogV4.Enabled() {
+			port := req.URL.Port()
+			host := req.URL.Hostname()
+			path := req.URL.Path
+			scheme := req.URL.Scheme
+			headers := p.HTTPGet.HTTPHeaders
+			klogV4.InfoS("HTTP-Probe", "scheme", scheme, "host", host, "port", port, "path", path, "timeout", timeout, "headers", headers, "probeType", probeType)
+		}
+		return pb.http.Probe(req, timeout)
+
+	case p.TCPSocket != nil:
+		port, err := probe.ResolveContainerPort(p.TCPSocket.Port, &container)
+		if err != nil {
+			klog.V(4).InfoS("TCP-Probe failed to resolve port", "error", err)
+			return probe.Unknown, "", err
+		}
+		host := p.TCPSocket.Host
+		if host == "" {
+			host = status.PodIP
+		}
+		klog.V(4).InfoS("TCP-Probe", "host", host, "port", port, "timeout", timeout)
+		return pb.tcp.Probe(host, port, timeout)
+
+	case p.GRPC != nil:
+		host := status.PodIP
+		service := ""
+		if p.GRPC.Service != nil {
+			service = *p.GRPC.Service
+		}
+		klog.V(4).InfoS("GRPC-Probe", "host", host, "service", service, "port", p.GRPC.Port, "timeout", timeout)
+		return pb.grpc.Probe(host, service, int(p.GRPC.Port), timeout)
+
+	default:
+		klog.V(4).InfoS("Failed to find probe builder for container", "containerName", container.Name)
+		return probe.Unknown, "", fmt.Errorf("missing probe handler for %s:%s", format.Pod(pod), container.Name)
 	}
-	return result, output, err
 }
 ```
