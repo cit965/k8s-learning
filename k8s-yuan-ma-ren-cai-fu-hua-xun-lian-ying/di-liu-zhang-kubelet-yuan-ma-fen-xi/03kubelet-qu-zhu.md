@@ -392,9 +392,12 @@ func (n *linuxCgroupNotifier) Stop() {
 
 还记得我们在 `managerImpl` 中看到的 `Start` 方法吗？不记得你可以回到上面再看下，在最后有一个调用 `synchronize` 的过程，这个方法会返回一个需要被驱逐的 pod。于是乎，我们需要知道在 `synchronize` 方法中是如何得到需要被驱逐的 pod 的。
 
-// synchronize 是驱逐管理器的主控制循环 // 返回被杀死的 Pod，如果没有 Pod 被杀死则返回 nil func (m \*managerImpl) synchronize(diskInfoProvider DiskInfoProvider, podFunc ActivePodsFunc) (\[]\*v1.Pod, error) {
+
 
 ```go
+// synchronize 是驱逐管理器的主控制循环
+// 返回被杀死的 Pod，如果没有 Pod 被杀死则返回 nil 
+func (m *managerImpl) synchronize(diskInfoProvider DiskInfoProvider, podFunc ActivePodsFunc) ([]*v1.Pod, error) {
 // 1. 基础检查
 // 如果没有配置阈值且不启用本地存储隔离，直接返回
 if len(thresholds) == 0 && !m.localStorageCapacityIsolation {
