@@ -64,6 +64,7 @@
 * [第六章： kubelet 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/README.md)
   * [01-kubelet 创建pod 流程](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/01kubelet-chuang-jian-pod-liu-cheng.md)
   * [02-kubelet 探针](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/02kubelet-tan-zhen.md)
+  * [03-kubelet 驱逐](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/03kubelet-qu-zhu.md)
 * [第七章： kubeproxy 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-qi-zhang-kubeproxy-yuan-ma-fen-xi.md)
 * [第八章： kubectl 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-ba-zhang-kubectl-yuan-ma-fen-xi.md)
 * [第九章： cloud-controller-manager 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-jiu-zhang-cloudcontrollermanager-yuan-ma-fen-xi.md)
