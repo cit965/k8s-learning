@@ -8,15 +8,7 @@ kubelet 监控集群节点的内存、磁盘空间和文件系统的 inode 等�
 
 如果 kubelet 回收节点级资源的尝试没有使驱逐信号低于条件， 则 kubelet 开始驱逐最终用户 Pod。
 
-kubelet 使用以下参数来确定 Pod 驱逐顺序：
-
-```
-1. 资源用量超过 request 的 Pod
-2. 按 Pod 优先级（PriorityClass）
-3. 相对于 request 的资源超用比例
-```
-
-因此，kubelet 按以下顺序排列和驱逐 Pod：
+kubelet 按以下顺序排列和驱逐 Pod：
 
 1. 首先考虑资源使用量超过其请求的 `BestEffort` 或 `Burstable` Pod。 这些 Pod 会根据它们的优先级以及它们的资源使用级别超过其请求的程度被逐出。
 2. 资源使用量少于请求量的 `Guaranteed` Pod 和 `Burstable` Pod 根据其优先级被最后驱逐。
@@ -25,8 +17,6 @@ kubelet 使用以下参数来确定 Pod 驱逐顺序：
 ## Qos
 
 QoS是`Quality of Service`的缩写，即服务质量。QoS 主要影响 OOM Killer 行为，不直接影响 kubelet 驱逐决策。
-
-### pod QoS级别 <a href="#podqos-ji-bie" id="podqos-ji-bie"></a>
 
 QoS主要分为`Guaranteed`、`Burstable`和`Best-Effort`三个级别，优先级从高到低。
 
