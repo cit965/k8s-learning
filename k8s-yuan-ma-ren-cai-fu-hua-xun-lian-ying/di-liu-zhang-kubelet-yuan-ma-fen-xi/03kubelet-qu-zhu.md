@@ -14,7 +14,7 @@ kubelet 按以下顺序排列和驱逐 Pod：
 2. 资源使用量少于请求量的 `Guaranteed` Pod 和 `Burstable` Pod 根据其优先级被最后驱逐。
 3. kubelet 不使用 Pod 的 QoS 类来确定驱逐顺序, QoS 主要用于系统 OOM 情况下的进程选择,内核自主行为
 
-## Qos
+## Qos （服务质量）
 
 QoS是`Quality of Service`的缩写，即服务质量。QoS 主要影响 OOM Killer 行为，不直接影响 kubelet 驱逐决策。
 
@@ -97,3 +97,383 @@ containers:
 ...
 ```
 
+## Eviction （驱逐）
+
+### 驱逐策略
+
+**软驱逐**
+
+软驱逐机制表示，当node节点的memory、nodefs等资源达到一定的阈值后，需要持续观察一段时间（宽限期），如果期间该资源又恢复到低于阈值，则不进行pod的驱逐，若高于阈值持续了一段时间（宽限期），则触发pod的驱逐。
+
+**硬驱逐**
+
+硬驱逐策略没有宽限期，当达到硬驱逐条件时，kubelet会立即触发pod的驱逐，而不是优雅终止。
+
+### 代码目录
+
+pkg/kubelet/eviction/eviction\_manager.go
+
+<figure><img src="../../.gitbook/assets/1740379560457.png" alt=""><figcaption></figcaption></figure>
+
+### Manager 接口
+
+```go
+// Manager evaluates when an eviction threshold for node stability has been met on the node.
+type Manager interface {
+    // Start starts the control loop to monitor eviction thresholds at specified interval.
+    Start(diskInfoProvider DiskInfoProvider, podFunc ActivePodsFunc, podCleanedUpFunc PodCleanedUpFunc, monitoringInterval time.Duration)
+
+    // IsUnderMemoryPressure returns true if the node is under memory pressure.
+    IsUnderMemoryPressure() bool
+
+    // IsUnderDiskPressure returns true if the node is under disk pressure.
+    IsUnderDiskPressure() bool
+
+    // IsUnderPIDPressure returns true if the node is under PID pressure.
+    IsUnderPIDPressure() bool
+}
+```
+
+这是 Kubelet 中的驱逐管理器(Eviction Manager)接口，主要负责监控节点资源状态并管理 Pod 驱逐。这里可以看到监控节点三种资源：
+
+* 内存使用
+* 磁盘使用
+* PID 使用
+
+Start 方法是驱逐管理器的核心方法，用于启动资源监控和驱逐控制循环。
+
+### ManagerImpl 实现
+
+我们可以看到实现接口的是 `managerImpl`（可以，这个命名很 java） 实现了 `Manager` 接口，然后看关键的 `Start` 方法：
+
+```go
+// Start starts the control loop to observe and response to low compute resources.
+func (m *managerImpl) Start(diskInfoProvider DiskInfoProvider, podFunc ActivePodsFunc, podCleanedUpFunc PodCleanedUpFunc, monitoringInterval time.Duration) {
+    thresholdHandler := func(message string) {
+       klog.InfoS(message)
+       m.synchronize(diskInfoProvider, podFunc)
+    }
+    klog.InfoS("Eviction manager: starting control loop")
+    // 启动实时驱逐
+    if m.config.KernelMemcgNotification || runtime.GOOS == "windows" {
+       for _, threshold := range m.config.Thresholds {
+          if threshold.Signal == evictionapi.SignalMemoryAvailable || threshold.Signal == evictionapi.SignalAllocatableMemoryAvailable {
+             notifier, err := NewMemoryThresholdNotifier(threshold, m.config.PodCgroupRoot, &CgroupNotifierFactory{}, thresholdHandler)
+             if err != nil {
+                klog.InfoS("Eviction manager: failed to create memory threshold notifier", "err", err)
+             } else {
+                go notifier.Start()
+                m.thresholdNotifiers = append(m.thresholdNotifiers, notifier)
+             }
+          }
+       }
+    }
+    // start the eviction manager monitoring
+    // 启动轮询驱逐
+    go func() {
+       for {
+          evictedPods, err := m.synchronize(diskInfoProvider, podFunc)
+          if evictedPods != nil && err == nil {
+             klog.InfoS("Eviction manager: pods evicted, waiting for pod to be cleaned up", "pods", klog.KObjSlice(evictedPods))
+             m.waitForPodsCleanup(podCleanedUpFunc, evictedPods)
+          } else {
+             if err != nil {
+                klog.ErrorS(err, "Eviction manager: failed to synchronize")
+             }
+             time.Sleep(monitoringInterval)
+          }
+       }
+    }()
+}
+```
+
+其中就有几个细节：
+
+1. 根据每个配置的限制阈值创建 `NewMemoryThresholdNotifier`
+2. 每个 `Notifier` 都是一个独立的协程去启动 `go notifier.Start()`
+3. 有一个单独的协程去监听 pod 执行 `m.synchronize`
+4. evictionManager.Start方法中包含了两部分的启动，实时驱逐和轮训驱逐, 如果配置了`KernelMemcgNotification.`则会针对memory内存资源，利用kernel memcg notification，根据内核实时通知，调用`m.synchronize`方法执行驱逐逻辑
+
+### MemoryThresholdNotifier <a href="#memorythresholdnotifier" id="memorythresholdnotifier"></a>
+
+我在没有看过源码之前，对于 cgroup 是有一个简单的了解的，知道 docker 就是通过 linux 的 namespace 和 cgroup 来隔离的。但我不明白的是，通知是怎么来的，如果让我自己去实现那么肯定是定期循环查询内存超过阈值则进行通知，肯定性能不好。
+
+于是，我就追着 `go notifier.Start()` 的 Start 找到了, 这里注意你的操作系统，如果是windows，代码会跳转到  memory\_threshold\_notifier\_windows.go ，由于我们主要学习 linux 源码, 故 window 版本不再详细讲解。
+
+```go
+// pkg/kubelet/eviction/memory_threshold_notifier_others.go:105
+func (m *linuxMemoryThresholdNotifier) Start() {
+	klog.InfoS("Eviction manager: created memoryThresholdNotifier", "notifier", m.Description())
+	for range m.events {
+		m.handler(fmt.Sprintf("eviction manager: %s crossed", m.Description()))
+	}
+}
+```
+
+可以看到，这里非常简单，就是不断地 handler events 这个 channel 的事件。所以，我们需要找到哪里在往 events 这个 channel 里面写入事件。引用位置只有一个那就是 `UpdateThreshold` 。
+
+```go
+type linuxMemoryThresholdNotifier struct {
+	threshold  evictionapi.Threshold
+	cgroupPath string
+	events     chan struct{}
+	factory    NotifierFactory
+	handler    func(string)
+	notifier   CgroupNotifier
+}
+
+// UpdateThreshold 更新内存阈值并设置通知器
+// 参数 summary: 包含节点资源使用统计信息
+func (m *linuxMemoryThresholdNotifier) UpdateThreshold(summary *statsapi.Summary) error {
+    // 获取节点内存统计信息
+    memoryStats := summary.Node.Memory
+    
+    // 如果是可分配资源的驱逐阈值,则使用 pods 系统容器的内存统计
+    if isAllocatableEvictionThreshold(m.threshold) {
+        allocatableContainer, err := getSysContainer(summary.Node.SystemContainers, statsapi.SystemContainerPods)
+        if err != nil {
+            return err
+        }
+        memoryStats = allocatableContainer.Memory
+    }
+
+    // 检查内存统计数据的完整性
+    if memoryStats == nil || memoryStats.UsageBytes == nil || memoryStats.WorkingSetBytes == nil || memoryStats.AvailableBytes == nil {
+        return fmt.Errorf("summary was incomplete. Expected MemoryStats and all subfields to be non-nil, but got %+v", memoryStats)
+    }
+
+    // 计算阈值
+    // 非活跃文件缓存 = 总使用量 - 工作集使用量
+    inactiveFile := resource.NewQuantity(int64(*memoryStats.UsageBytes-*memoryStats.WorkingSetBytes), resource.BinarySI)
+    // 总容量 = 可用内存 + 工作集使用量
+    capacity := resource.NewQuantity(int64(*memoryStats.AvailableBytes+*memoryStats.WorkingSetBytes), resource.BinarySI)
+    // 获取驱逐阈值
+    evictionThresholdQuantity := evictionapi.GetThresholdQuantity(m.threshold.Value, capacity)
+    
+    // 计算 cgroup 内存阈值
+    // memcgThreshold = 容量 - 驱逐阈值 + 非活跃文件缓存
+    memcgThreshold := capacity.DeepCopy()
+    memcgThreshold.Sub(*evictionThresholdQuantity)
+    memcgThreshold.Add(*inactiveFile)
+
+    klog.V(3).InfoS("Eviction manager: setting notifier to capacity", "notifier", m.Description(), "capacity", memcgThreshold.String())
+
+    // 如果存在旧的通知器,先停止它
+    if m.notifier != nil {
+        m.notifier.Stop()
+    }
+
+    // 创建新的 cgroup 通知器
+    newNotifier, err := m.factory.NewCgroupNotifier(m.cgroupPath, memoryUsageAttribute, memcgThreshold.Value())
+    if err != nil {
+        return err
+    }
+
+    // 保存新通知器并启动监控
+    m.notifier = newNotifier
+    go m.notifier.Start(m.events)
+    return nil
+}
+
+```
+
+这里我们就见到主角了，`NewCgroupNotifier` 也就是 `Cgroup` 了。这里有个细节是 factory 是 `NotifierFactory` 也就是利用了设计模式中的工厂模式，抽象了一下生成的方法。
+
+### CgroupNotifyier
+
+```go
+// linuxCgroupNotifier 实现了 cgroup 内存阈值通知机制
+type linuxCgroupNotifier struct {
+    eventfd  int        // 用于接收事件的文件描述符
+    epfd     int        // epoll 实例的文件描述符
+    stop     chan struct{} // 停止通知的信号通道
+    stopLock sync.Mutex    // 保护 stop 操作的互斥锁
+}
+
+// NewCgroupNotifier 创建一个新的 cgroup 通知器
+func NewCgroupNotifier(path, attribute string, threshold int64) (CgroupNotifier, error) {
+    // 如果是 cgroupv2，返回一个禁用的通知器
+    // cgroupv2 不支持使用 cgroup.event_control 监控内存阈值
+    if libcontainercgroups.IsCgroup2UnifiedMode() {
+        return &disabledThresholdNotifier{}, nil
+    }
+
+    // 初始化过程:
+    // 1. 打开要监控的属性文件(如 memory.usage_in_bytes)
+    watchfd, err := unix.Open(fmt.Sprintf("%s/%s", path, attribute), unix.O_RDONLY|unix.O_CLOEXEC, 0)
+    
+    // 2. 打开 cgroup 事件控制文件
+    controlfd, err := unix.Open(fmt.Sprintf("%s/cgroup.event_control", path), unix.O_WRONLY|unix.O_CLOEXEC, 0)
+    
+    // 3. 创建 eventfd 用于接收通知
+    eventfd, err := unix.Eventfd(0, unix.EFD_CLOEXEC)
+    
+    // 4. 创建 epoll 实例
+    epfd, err := unix.EpollCreate1(unix.EPOLL_CLOEXEC)
+    
+    // 5. 写入配置到 cgroup.event_control
+    config := fmt.Sprintf("%d %d %d", eventfd, watchfd, threshold)
+    _, err = unix.Write(controlfd, []byte(config))
+
+    return &linuxCgroupNotifier{...}, nil
+}
+
+// Start 启动通知监听
+func (n *linuxCgroupNotifier) Start(eventCh chan<- struct{}) {
+    // 1. 将 eventfd 添加到 epoll 监控
+    err := unix.EpollCtl(n.epfd, unix.EPOLL_CTL_ADD, n.eventfd, &unix.EpollEvent{
+        Fd:     int32(n.eventfd),
+        Events: unix.EPOLLIN,
+    })
+
+    // 2. 循环等待事件
+    for {
+        select {
+        case <-n.stop:
+            return
+        default:
+            // 等待 epoll 事件
+            event, err := wait(n.epfd, n.eventfd, notifierRefreshInterval)
+            if event {
+                // 读取事件数据
+                _, err = unix.Read(n.eventfd, buf)
+                // 发送通知
+                eventCh <- struct{}{}
+            }
+        }
+    }
+}
+
+// wait 等待 epoll 事件
+func wait(epfd, eventfd int, timeout time.Duration) (bool, error) {
+    // 等待 epoll 事件
+    events := make([]unix.EpollEvent, numFdEvents+1)
+    timeoutMS := int(timeout / time.Millisecond)
+    n, err := unix.EpollWait(epfd, events, timeoutMS)
+    
+    // 处理各种事件类型：
+    // - EPOLLHUP: 挂起事件
+    // - EPOLLERR: 错误事件
+    // - EPOLLIN: 可读事件
+    for _, event := range events[:n] {
+        if event.Fd == int32(eventfd) {
+            if event.Events&unix.EPOLLHUP != 0 || 
+               event.Events&unix.EPOLLERR != 0 || 
+               event.Events&unix.EPOLLIN != 0 {
+                return true, nil
+            }
+        }
+    }
+    return false, nil
+}
+
+// Stop 停止通知器
+func (n *linuxCgroupNotifier) Stop() {
+    n.stopLock.Lock()
+    defer n.stopLock.Unlock()
+    
+    // 检查是否已经停止
+    select {
+    case <-n.stop:
+        return
+    default:
+        // 关闭文件描述符
+        unix.Close(n.eventfd)
+        unix.Close(n.epfd)
+        // 关闭停止信号通道
+        close(n.stop)
+    }
+}
+```
+
+这段代码实现了 Linux cgroup 的内存阈值通知机制：通过在 cgroup 的 event\_control 文件中配置 eventfd、watchfd 和阈值，让内核在内存使用超过阈值时通过 eventfd 发送通知；使用 epoll 机制高效地监听这个 eventfd，当收到通知时，通过 channel 通知上层的 kubelet 驱逐管理器，从而触发相应的 Pod 驱逐操作，以此来保护节点的内存资源。
+
+### synchronize
+
+还记得我们在 `managerImpl` 中看到的 `Start` 方法吗？不记得你可以回到上面再看下，在最后有一个调用 `synchronize` 的过程，这个方法会返回一个需要被驱逐的 pod。于是乎，我们需要知道在 `synchronize` 方法中是如何得到需要被驱逐的 pod 的。
+
+// synchronize 是驱逐管理器的主控制循环 // 返回被杀死的 Pod，如果没有 Pod 被杀死则返回 nil func (m \*managerImpl) synchronize(diskInfoProvider DiskInfoProvider, podFunc ActivePodsFunc) (\[]\*v1.Pod, error) {
+
+```go
+// 1. 基础检查
+// 如果没有配置阈值且不启用本地存储隔离，直接返回
+if len(thresholds) == 0 && !m.localStorageCapacityIsolation {
+    return nil, nil
+}
+
+// 2. 文件系统检查
+// 检查是否有专用的镜像文件系统
+if m.dedicatedImageFs == nil {
+    hasImageFs, err := diskInfoProvider.HasDedicatedImageFs(ctx)
+    // ... 初始化文件系统相关配置
+}
+
+// 3. 获取状态
+// 获取活跃 Pod 列表
+activePods := podFunc()
+// 获取节点摘要统计信息
+summary, err := m.summaryProvider.Get(ctx, updateStats)
+
+// 4. 更新通知器阈值
+if m.clock.Since(m.thresholdsLastUpdated) > notifierRefreshInterval {
+    // 更新所有阈值通知器
+    for _, notifier := range m.thresholdNotifiers {
+        notifier.UpdateThreshold(summary)
+    }
+}
+
+// 5. 获取观察结果
+// 收集资源使用观察结果
+observations, statsFunc := makeSignalObservations(summary)
+
+// 6. 检查阈值
+// 检查哪些阈值被触发
+thresholds = thresholdsMet(thresholds, observations, false)
+
+// 7. 更新节点状态
+// 根据阈值更新节点状况
+nodeConditions := nodeConditions(thresholds)
+
+// 8. 本地存储驱逐
+if m.localStorageCapacityIsolation {
+    if evictedPods := m.localStorageEviction(activePods, statsFunc); len(evictedPods) > 0 {
+        return evictedPods, nil
+    }
+}
+
+// 9. 资源回收
+// 尝试回收节点级资源
+if m.reclaimNodeLevelResources(ctx, thresholdToReclaim.Signal, resourceToReclaim) {
+    return nil, nil
+}
+
+// 10. Pod 驱逐
+// 对 Pod 进行排序
+rank(activePods, statsFunc)
+
+// 选择并驱逐一个 Pod
+for i := range activePods {
+    pod := activePods[i]
+    // 设置优雅期限
+    gracePeriodOverride := int64(immediateEvictionGracePeriodSeconds)
+    
+    // 执行驱逐
+    if m.evictPod(pod, gracePeriodOverride, message, annotations, condition) {
+        return []*v1.Pod{pod}, nil
+    }
+}
+
+return nil, nil
+}
+```
+
+synchronize 是 kubelet 驱逐管理器的核心控制循环，它通过收集节点资源使用情况、检查配置的阈值是否触发、更新阈值通知器、尝试回收节点级资源（如容器镜像），当这些措施无法缓解资源压力时，会根据驱逐策略选择一个 Pod 进行驱逐，以此来保护节点的稳定运行，每次循环最多驱逐一个 Pod，整个过程是渐进式和可控的。
+
+## 总结
+
+1. pod 的资源限制条件何时会被检查？
+   * 有两种，cgroup 会触发监听内存，一旦资源超过限制就会有事件，从而触发 hander 也就是 `synchronize` 立刻检查；还有一种就是定时执行 `synchronize` 间隔是 `monitoringInterval` 默认是 10s
+2. pod 何时会被驱逐？
+   * 当检查出现问题立刻驱逐，所以何时和检查间隔有关。
+3. pod 驱逐的策略是什么？
+   * 每次先驱逐最不满足要求且消耗最大的那**一个**，并不会一次把不满足要求的都驱逐，因为可能驱逐一个之后，后面的使用资源是可以满足余下的 pod 的。
