@@ -10,7 +10,7 @@ kubelet 监控集群节点的内存、磁盘空间和文件系统的 inode 等�
 
 kubelet 使用以下参数来确定 Pod 驱逐顺序：
 
-```go
+```
 1. 资源用量超过 request 的 Pod
 2. 按 Pod 优先级（PriorityClass）
 3. 相对于 request 的资源超用比例
@@ -24,7 +24,7 @@ kubelet 使用以下参数来确定 Pod 驱逐顺序：
 
 ## Qos
 
-QoS是`Quality of Service`的缩写，即服务质量。每个pod属于某一个QoS分类，而Kubernetes会根据pod的QoS级别来决定pod的调度、抢占调度和驱逐优先级，而且pod的QoS级别也影响oomkiller对杀死进程的选择。
+QoS是`Quality of Service`的缩写，即服务质量。QoS 主要影响 OOM Killer 行为，不直接影响 kubelet 驱逐决策。
 
 ### pod QoS级别 <a href="#podqos-ji-bie" id="podqos-ji-bie"></a>
 
