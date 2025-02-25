@@ -464,27 +464,6 @@ return nil, nil
 
 synchronize 是 kubelet 驱逐管理器的核心控制循环，它通过收集节点资源使用情况、检查配置的阈值是否触发、更新阈值通知器、尝试回收节点级资源（如容器镜像），当这些措施无法缓解资源压力时，会根据驱逐策略选择一个 Pod 进行驱逐，以此来保护节点的稳定运行，每次循环最多驱逐一个 Pod，整个过程是渐进式和可控的。
 
-### &#x20;最小驱逐回收
-
-在某些情况下，驱逐 Pod 只会回收少量的紧俏资源。 这可能导致 kubelet 反复达到配置的驱逐条件并触发多次驱逐。
-
-你可以使用 `--eviction-minimum-reclaim` 标志或 [kubelet 配置文件](https://kubernetes.io/zh-cn/docs/tasks/administer-cluster/kubelet-config-file/) 为每个资源配置最小回收量。 当 kubelet 注意到某个资源耗尽时，它会继续回收该资源，直到回收到你所指定的数量为止。
-
-例如，以下配置设置最小回收量：
-
-```yaml
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-evictionHard:
-  memory.available: "500Mi"
-  nodefs.available: "1Gi"
-  imagefs.available: "100Gi"
-evictionMinimumReclaim:
-  memory.available: "0Mi"
-  nodefs.available: "500Mi"
-  imagefs.available: "2Gi"
-```
-
 ### Admit 阶段抢占式驱逐
 
 &#x20;kubelet 检查pod是否能在这个节点被起来 (admit) 失败时候的一次补救，驱逐优先级低的 pod 来释放资源
