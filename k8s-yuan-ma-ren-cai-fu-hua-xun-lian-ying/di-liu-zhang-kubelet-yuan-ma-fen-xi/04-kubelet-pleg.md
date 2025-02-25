@@ -177,9 +177,7 @@ func (g *GenericPLEG) Relist() {
 
 ```
 
-Generic PLEG 定时向 runtime 进行查询，这个过程称为 relist，这里会调用 cri 的 `ListPodSandbox` 和 `ListContainers`接口。runtime 返回所有的数据之后，PLEG 会根据 sandbox 和 container 上的数据，对应的 Pod 上，并更新到缓存中。同时，组装成事件向 PLEG Channel 发送。
-
-kubelet 会在 pod sync loop 中监听 PLEG Channel，从而针对状态变化执行相应的逻辑，来尽量保证 pod spec 和 status 的一致。
+Generic PLEG 定时向 runtime 进行查询，这个过程称为 relist，这里会调用 cri 的 `ListPodSandbox` 和 `ListContainers`接口。runtime 返回所有的数据之后，PLEG 会根据podID 调用 cri 的 `GetPosStatus` 接口获取详细信息并更新到缓存中。同时，组装成事件向 PLEG Channel 发送。kubelet 会在 pod sync loop 中监听 PLEG Channel，从而针对状态变化执行相应的逻辑，来尽量保证 pod spec 和 status 的一致。
 
 <figure><img src="../../.gitbook/assets/image (80).png" alt=""><figcaption></figcaption></figure>
 
@@ -245,21 +243,9 @@ type EventedPLEG struct {
 }
 ```
 
-引入 Evented PLEG 后，对 Generic PLEG 做了些许调整，主要是 relist 的周期和阈值，以及对缓存的更新策略。
+引入 Evented PLEG 后，通过调用 runtime 的 `GetContainerEvents（需要runtime支持）` 来监听 runtime 中的事件，然后生成 pod 的 event，并发送到 PLEG Channel 中供 kubelet pod sync loop 消费。
 
-* relist 的同步周期由 1s 增加到 300s。同步阈值从 3min 增加到 10min。
-* 缓存更新时，updateTime 不再是取本地的时间，而是 runtime 返回的时间。
-
-除此之外，Generic PLEG 会和之前一样运行，这样也保证了及时 Evented PLEG 丢失了一些 状态变更的 event，也可以由 Generic PLEG 兜底。
-
-Evented PLEG 会调用 runtime 的 `GetContainerEvents` 来监听 runtime 中的事件，然后生成 pod 的 event，并发送到 PLEG Channel 中供 kubelet pod sync loop 消费。
-
-如果 Evented 不能按照预期工作（比如 runtime 不支持 GetContainerEvents），还会降级到 Generic PLEG。降级逻辑是：
-
-* 停止自己。
-* 停止已有的 Generic PLEG。
-* 更新 Generic PLEG 的 relist 周期和阈值为 1s, 3min。
-* 启动新的 Generic PLEG。
+如果 Evented 不能按照预期工作（比如 runtime 不支持 GetContainerEvents），降级到 Generic PLEG。
 
 <figure><img src="../../.gitbook/assets/image (81).png" alt=""><figcaption></figcaption></figure>
 
