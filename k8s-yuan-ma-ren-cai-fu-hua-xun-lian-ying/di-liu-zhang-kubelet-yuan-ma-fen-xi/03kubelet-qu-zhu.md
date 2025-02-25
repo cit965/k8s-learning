@@ -1,26 +1,18 @@
 # 03-kubelet 驱逐
 
-kubelet 监控集群节点的内存、磁盘空间和文件系统的 inode 等资源。 当这些资源中的一个或者多个达到特定的消耗水平， kubelet 可以主动地使节点上一个或者多个 Pod 失效，以回收资源防止饥饿。
+kubelet 监控集群节点的内存、磁盘空间和文件系统等资源。 当这些资源中的一个或者多个达到特定的消耗水平， kubelet 可以主动地使节点上一个或者多个 Pod 被驱逐，当处理不可压缩的计算资源（例如内存或磁盘）时，这一点尤其重要。如果两种资源都用尽，则节点将变得不稳定。
 
-在节点压力驱逐期间，kubelet 将所选 Pod 的阶段设置为 `Failed` 并终止 Pod。
+kubelet 借助内核 OOM 机制来自动杀死 Qos 级别较低的容器 (通常是`BestEffort`)，这种方式让系统容易返回不稳定状态，因为由于OOM而被杀死的容器要么重新启动，要么安排新的POD到节点。
 
-## kubelet 驱逐时 Pod 的选择[ ](https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/node-pressure-eviction/#kubelet-%E9%A9%B1%E9%80%90%E6%97%B6-pod-%E7%9A%84%E9%80%89%E6%8B%A9) <a href="#kubelet-qu-zhu-shi-pod-de-xuan-ze" id="kubelet-qu-zhu-shi-pod-de-xuan-ze"></a>
-
-如果 kubelet 回收节点级资源的尝试没有使驱逐信号低于条件， 则 kubelet 开始驱逐最终用户 Pod。
-
-kubelet 按以下顺序排列和驱逐 Pod：
-
-1. 首先考虑资源使用量超过其请求的 `BestEffort` 或 `Burstable` Pod。 这些 Pod 会根据它们的优先级以及它们的资源使用级别超过其请求的程度被逐出。
-2. 资源使用量少于请求量的 `Guaranteed` Pod 和 `Burstable` Pod 根据其优先级被最后驱逐。
-3. kubelet 不使用 Pod 的 QoS 类来确定驱逐顺序, QoS 主要用于系统 OOM 情况下的进程选择,内核自主行为
+取而代之的是，我们更喜欢一个系统， `kubelet`可以亲自监视并防止整个计算资源的饥饿，并且在可能发生的情况下，主动地失败了一个或多个POD，因此工作负载可以当/如果其备份控制器创建一个新的POD时，请移动并安排在其他地方。这个就是**驱逐机制**。**驱逐机制是对 Qos 的补充**，两者并不直接相关，比较独立。
 
 ## Qos （服务质量）
 
 QoS是`Quality of Service`的缩写，即服务质量。QoS 主要影响 OOM Killer 行为，不直接影响 kubelet 驱逐决策。
 
-QoS主要分为`Guaranteed`、`Burstable`和`Best-Effort`三个级别，优先级从高到低。
+QoS主要分为`Guaranteed`、`Burstable`和`Best-Effort`三个级别，优先级从高到低。那么怎么决定某个pod属于哪个QoS分类呢？根据pod yaml中的cpu和内存资源定义决定。
 
-怎么决定某个pod属于哪个QoS分类呢？根据pod yaml中的cpu和内存资源定义决定。
+内核资源不够时候，会根据 Qos 级别来自动杀死进程。
 
 ### **Guaranteed**
 
