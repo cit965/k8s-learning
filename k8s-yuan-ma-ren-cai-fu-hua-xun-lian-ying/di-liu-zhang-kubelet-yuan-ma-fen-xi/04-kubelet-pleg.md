@@ -147,7 +147,7 @@ Generic PLEG 定时向 runtime 进行查询，这个过程称为 relist，这里
 
 kubelet 会在 pod sync loop 中监听 PLEG Channel，从而针对状态变化执行相应的逻辑，来尽量保证 pod spec 和 status 的一致。
 
-<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (80).png" alt=""><figcaption></figcaption></figure>
 
 ### EventedPLEG (新实现):
 
@@ -225,5 +225,6 @@ Evented PLEG 会调用 runtime 的 `GetContainerEvents` 来监听 runtime 中的
 * 更新 Generic PLEG 的 relist 周期和阈值为 1s, 3min。
 * 启动新的 Generic PLEG。
 
-<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (81).png" alt=""><figcaption></figcaption></figure>
 
+<figure><img src="../../.gitbook/assets/image (82).png" alt=""><figcaption></figcaption></figure>
