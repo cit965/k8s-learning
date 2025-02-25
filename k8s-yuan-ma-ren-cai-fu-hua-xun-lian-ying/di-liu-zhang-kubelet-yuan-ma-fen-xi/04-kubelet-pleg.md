@@ -247,6 +247,59 @@ type EventedPLEG struct {
 
 如果 Evented 不能按照预期工作（比如 runtime 不支持 GetContainerEvents），降级到 Generic PLEG。
 
+```go
+// Start starts the Evented PLEG
+func (e *EventedPLEG) Start() {
+    e.runningMu.Lock()
+    defer e.runningMu.Unlock()
+    if isEventedPLEGInUse() {
+       return
+    }
+    setEventedPLEGUsage(true)
+    e.stopCh = make(chan struct{})
+    e.stopCacheUpdateCh = make(chan struct{})
+    go wait.Until(e.watchEventsChannel, 0, e.stopCh)
+    go wait.Until(e.updateGlobalCache, globalCacheUpdatePeriod, e.stopCacheUpdateCh)
+}
+
+func (e *EventedPLEG) watchEventsChannel() {
+	containerEventsResponseCh := make(chan *runtimeapi.ContainerEventResponse, cap(e.eventChannel))
+	defer close(containerEventsResponseCh)
+
+	// Get the container events from the runtime.
+	go func() {
+		numAttempts := 0
+		for {
+			if numAttempts >= e.eventedPlegMaxStreamRetries {
+				if isEventedPLEGInUse() {
+					// Fall back to Generic PLEG relisting since Evented PLEG is not working.
+					e.logger.V(4).Info("Fall back to Generic PLEG relisting since Evented PLEG is not working")
+					e.Stop()
+					e.genericPleg.Stop()       // Stop the existing Generic PLEG which runs with longer relisting period when Evented PLEG is in use.
+					e.Update(e.relistDuration) // Update the relisting period to the default value for the Generic PLEG.
+					e.genericPleg.Start()
+					break
+				}
+			}
+
+			err := e.runtimeService.GetContainerEvents(context.Background(), containerEventsResponseCh, func(runtimeapi.RuntimeService_GetContainerEventsClient) {
+				metrics.EventedPLEGConn.Inc()
+			})
+			if err != nil {
+				metrics.EventedPLEGConnErr.Inc()
+				numAttempts++
+				e.Relist() // Force a relist to get the latest container and pods running metric.
+				e.logger.V(4).Info("Evented PLEG: Failed to get container events, retrying: ", "err", err)
+			}
+		}
+	}()
+
+	if isEventedPLEGInUse() {
+		e.processCRIEvents(containerEventsResponseCh)
+	}
+}
+```
+
 <figure><img src="../../.gitbook/assets/image (81).png" alt=""><figcaption></figcaption></figure>
 
 <figure><img src="../../.gitbook/assets/image (82).png" alt=""><figcaption></figcaption></figure>
