@@ -1,5 +1,51 @@
 # 04-kubelet pleg
 
+kubelet 的工作核心，就是一个控制循环，即：SyncLoop（图中的大圆圈）。而驱动这个控制循环运行的事件中，有个叫做 PLEG 的组件，负责告诉 kubelet 容器运行时状态变更事件。
+
+<figure><img src="../../.gitbook/assets/1740466501119.png" alt=""><figcaption></figcaption></figure>
+
+```go
+// syncLoopIteration reads from various channels and dispatches pods to the
+// given handler.
+//
+// Arguments:
+// 1.  configCh:       a channel to read config events from
+// 2.  handler:        the SyncHandler to dispatch pods to
+// 3.  syncCh:         a channel to read periodic sync events from
+// 4.  housekeepingCh: a channel to read housekeeping events from
+// 5.  plegCh:         a channel to read PLEG updates from
+//   - plegCh: update the runtime cache; sync pod
+
+func (kl *Kubelet) syncLoopIteration(ctx context.Context, configCh <-chan kubetypes.PodUpdate, handler SyncHandler,
+    syncCh <-chan time.Time, housekeepingCh <-chan time.Time, plegCh <-chan *pleg.PodLifecycleEvent) bool {
+    select {
+    case u, open := <-configCh:
+    case e := <-plegCh:
+       if isSyncPodWorthy(e) {
+          // PLEG event for a pod; sync it.
+          if pod, ok := kl.podManager.GetPodByUID(e.ID); ok {
+             klog.V(2).InfoS("SyncLoop (PLEG): event for pod", "pod", klog.KObj(pod), "event", e)
+             handler.HandlePodSyncs([]*v1.Pod{pod})
+          } else {
+             // If the pod no longer exists, ignore the event.
+             klog.V(4).InfoS("SyncLoop (PLEG): pod does not exist, ignore irrelevant event", "event", e)
+          }
+       }
+
+       if e.Type == pleg.ContainerDied {
+          if containerID, ok := e.Data.(string); ok {
+             kl.cleanUpContainersInPod(e.ID, containerID)
+          }
+       }
+    case <-syncCh:
+    case update := <-kl.livenessManager.Updates():
+    case update := <-kl.readinessManager.Updates():
+    case update := <-kl.startupManager.Updates():
+    case update := <-kl.containerManager.Updates():
+    case <-housekeepingCh:  
+}
+```
+
 ## 基本概念
 
 Kubelet是一个节点守护程序，它可以管理节点上的 pod ，驱动 pod status 使其匹配 spec 。为此，kubelet需要对 pod spec 和 container  status 做出反应。
