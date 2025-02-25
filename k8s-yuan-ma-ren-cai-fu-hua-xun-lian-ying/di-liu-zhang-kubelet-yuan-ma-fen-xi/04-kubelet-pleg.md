@@ -69,11 +69,6 @@ Kubernetes 提供了两种 PLEG 实现:
 // 注意：GenericPLEG 假设容器不会在一个 relist 周期内完成创建、终止和垃圾回收。
 // 如果发生这种情况，将会丢失该容器的所有事件。在 relist 失败的情况下，
 // 这个时间窗口可能会变得更长。
-//
-// 这个假设并非独特 —— 许多 kubelet 内部组件都依赖已终止的容器作为记账用的标记。
-// 垃圾收集器就是为处理这种情况而设计的。然而，为确保 kubelet 能够处理丢失的
-// 容器事件，建议将 relist 周期设置得较短，并在 kubelet 中设置一个较长的
-// 定期同步作为安全网。
 type GenericPLEG struct {
     // runtime 是容器运行时接口，用于与容器运行时交互
     // 通过它可以获取容器状态、执行容器操作等
@@ -141,6 +136,45 @@ type GenericPLEG struct {
     watchConditionsLock sync.Mutex
 }
 
+
+// Start spawns a goroutine to relist periodically.
+func (g *GenericPLEG) Start() {
+	g.runningMu.Lock()
+	defer g.runningMu.Unlock()
+	if !g.isRunning {
+		g.isRunning = true
+		g.stopCh = make(chan struct{})
+		go wait.Until(g.Relist, g.relistDuration.RelistPeriod, g.stopCh)
+	}
+}
+
+// Relist queries the container runtime for list of pods/containers, compare
+// with the internal pods/containers, and generates events accordingly.
+func (g *GenericPLEG) Relist() {
+	g.relistLock.Lock()
+	
+
+	timestamp := g.clock.Now()
+
+	// Get all the pods.
+	podList, err := g.runtime.GetPods(ctx, true)
+	g.updateRelistTime(timestamp)
+	
+	for pid := range g.podRecords {
+		// updateCache() will inspect the pod and update the cache. If an
+		// error occurs during the inspection, we want PLEG to retry again
+		// in the next relist. To achieve this, we do not update the
+		// associated podRecord of the pod, so that the change will be
+		// detect again in the next relist.
+		// TODO: If many pods changed during the same relist period,
+		// inspecting the pod and getting the PodStatus to update the cache
+		// serially may take a while. We should be aware of this and
+		// parallelize if needed.
+		status, updated, err := g.updateCache(ctx, pod, pid)
+        
+}
+
+
 ```
 
 Generic PLEG 定时向 runtime 进行查询，这个过程称为 relist，这里会调用 cri 的 `ListPodSandbox` 和 `ListContainers`接口。runtime 返回所有的数据之后，PLEG 会根据 sandbox 和 container 上的数据，对应的 Pod 上，并更新到缓存中。同时，组装成事件向 PLEG Channel 发送。
@@ -148,6 +182,8 @@ Generic PLEG 定时向 runtime 进行查询，这个过程称为 relist，这里
 kubelet 会在 pod sync loop 中监听 PLEG Channel，从而针对状态变化执行相应的逻辑，来尽量保证 pod spec 和 status 的一致。
 
 <figure><img src="../../.gitbook/assets/image (80).png" alt=""><figcaption></figcaption></figure>
+
+
 
 ### EventedPLEG (新实现):
 
