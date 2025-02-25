@@ -105,7 +105,7 @@ DeltaFIFO与其他队列最大的不同之处是，它会保留所有关于资�
 
 queue字段存储资源对象的key，该key通过KeyOf函数计算得到。items字段通过map数据结构的方式存储，value存储的是对象的Deltas数组。DeltaFIFO存储结构如图所示。
 
-<figure><img src="../../.gitbook/assets/image (3) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (3) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### 生产者
 

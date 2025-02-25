@@ -4,7 +4,7 @@
 
 informer 设计之初是为了更好的写 controller，本章我们来手写一个 controller，下图是官方推荐的编程模式：
 
-<figure><img src="../../.gitbook/assets/image (2) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 * 控制器包含三部分： informer ，workqueue，control loop
 * informer 负责同步远端集群资源到本地缓存Indexer

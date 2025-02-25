@@ -1,149 +1,229 @@
 # 04-kubelet pleg
 
-<figure><img src="../../.gitbook/assets/image (79).png" alt=""><figcaption></figcaption></figure>
+## 基本概念
 
-## 1. PLEG 的基本概念
+Kubelet是一个节点守护程序，它可以管理节点上的 pod ，驱动 pod status 使其匹配spec 。为此，kubelet需要对（1）pod spec 和（2）container  status 做出反应。
 
-PLEG 是 Kubelet 中的一个重要组件,主要负责:
+**PLEG** 全称是 **Pod Lifecycle Event Generator**，PLEG 的主要职责是定期检查节点上所有 Pod 的状态，并与上一次检查的结果进行比较，从而检测出 Pod 状态的变化（如容器启动、停止、崩溃等）。这些状态变化会被封装成事件，供 Kubelet 的其他模块（如同步循环）使用。
 
-* 监控容器状态变化
+## 前世今生
 
-2\. 生成容器生命周期事件
+在 1.1 及之前的 kubelet 中是没有 PLEG 的实现的。kubelet 会为每个 pod 单独启动一个 worker，这个 worker 负责向 container runtime 查询该 pod 对应的 sandbox 和 container 的状态，并进行状态同步逻辑的执行。这种 one worker per pod 的 polling 模型给 kubelet 带来了较大的性能损耗。即使这个 pod 没有任何的状态变化，也要不停的对 container runtime 进行主动查询。
 
-* 更新 Pod 缓存状态
+因此在 1.2 中，kubelet 引入了 PLEG，将所有 container runtime 上 sandbox 和 container 的状态变化事件统一到 PLEG 这个单独的组件中，实现了 one worker all pods。这种实现相比于 one worker per pod 已经带来了较大的性能提升，详细实现会在后文进行介绍。但是默认情况下，仍然需要每秒一次的主动向 container runtime 查询，在 node 负载很高的情况下，依然会有一定的性能问题，比较常见的情况是导致 node not ready，错误原因是 `PLEG is not healthy`。
 
-## 2. PLEG 的两种实现
+在 1.26 中，kubelet 引入了 Evented PLEG，为了和之前的 PLEG 实现区别，之前的 PLEG 称为 Generic PLEG。当然，Evented PLEG 并不是为了取代 Generic PLEG，而是和 Generic PLEG 配合，降低 Generic PLEG 的 polling 频率，从而提高性能的同时，也能保证实时性。
+
+
+
+<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+
+## 事件类型
+
+```go
+type PodLifeCycleEventType string
+
+const (
+    // 1. 容器启动事件
+    ContainerStarted PodLifeCycleEventType = "ContainerStarted"
+    
+    // 2. 容器退出事件
+    ContainerDied PodLifeCycleEventType = "ContainerDied"
+    
+    // 3. 容器移除事件
+    ContainerRemoved PodLifeCycleEventType = "ContainerRemoved"
+    
+    // 4. Pod 同步事件
+    PodSync PodLifeCycleEventType = "PodSync"
+    
+    // 5. 容器状态变更事件
+    ContainerChanged PodLifeCycleEventType = "ContainerChanged"
+    
+    // 6. 条件满足事件
+    ConditionMet PodLifeCycleEventType = "ConditionMet"
+)
+// PodLifecycleEvent is an event that reflects the change of the pod state.
+type PodLifecycleEvent struct {
+	// The pod ID.
+	ID types.UID
+	// The type of the event.
+	Type PodLifeCycleEventType
+	// The accompanied data which varies based on the event type.
+	//   - ContainerStarted/ContainerStopped: the container name (string).
+	//   - All other event types: unused.
+	Data interface{}
+}
+```
+
+## PLEG 的两种实现
 
 Kubernetes 提供了两种 PLEG 实现:
 
-* GenericPLEG (传统实现):
+### GenericPLEG (传统实现):
 
 ```go
+
+// GenericPLEG 是一个基于定期 list 来发现容器变化的简单 PLEG 实现。
+// 它作为临时替代方案，用于那些尚未支持完善事件生成器的容器运行时。
+//
+// 注意：GenericPLEG 假设容器不会在一个 relist 周期内完成创建、终止和垃圾回收。
+// 如果发生这种情况，将会丢失该容器的所有事件。在 relist 失败的情况下，
+// 这个时间窗口可能会变得更长。
+//
+// 这个假设并非独特 —— 许多 kubelet 内部组件都依赖已终止的容器作为记账用的标记。
+// 垃圾收集器就是为处理这种情况而设计的。然而，为确保 kubelet 能够处理丢失的
+// 容器事件，建议将 relist 周期设置得较短，并在 kubelet 中设置一个较长的
+// 定期同步作为安全网。
 type GenericPLEG struct {
-    runtime Runtime
-    cache Cache 
+    // runtime 是容器运行时接口，用于与容器运行时交互
+    // 通过它可以获取容器状态、执行容器操作等
+    runtime kubecontainer.Runtime
+
+    // eventChannel 是事件通道，订阅者通过此通道监听容器生命周期事件
+    // 当发现容器状态变化时，相关事件会被发送到此通道
     eventChannel chan *PodLifecycleEvent
-    podRecords podRecords  // 记录 Pod 状态
-    relistPeriod time.Duration  // 重新列举周期
+
+    // podRecords 是 Pod/容器信息的内部缓存
+    // 用于存储上一次 relist 时的 Pod 状态，用于状态对比
+    podRecords podRecords
+
+    // relistTime 记录最后一次执行 relist 的时间
+    // 使用 atomic.Value 确保并发安全
+    relistTime atomic.Value
+
+    // cache 用于存储同步 Pod 所需的运行时状态
+    // 这个缓存对于提高性能和减少对容器运行时的直接调用很重要
+    cache kubecontainer.Cache
+
+    // clock 用于测试目的，允许在测试中注入模拟时钟
+    // 这样可以更好地控制时间相关的测试
+    clock clock.Clock
+
+    // podsToReinspect 记录在 relist 过程中获取状态失败的 Pod
+    // 这些 Pod 将在下一次 relist 时重试
+    podsToReinspect map[types.UID]*kubecontainer.Pod
+
+    // stopCh 是用于停止 Generic PLEG 的通道
+    // 关闭此通道将导致 PLEG 停止运行
+    stopCh chan struct{}
+
+    // relistLock 用于对 Generic PLEG 的 relist 操作加锁
+    // 确保同一时间只有一个 relist 操作在执行
+    relistLock sync.Mutex
+
+    // isRunning 标识 Generic PLEG 是否正在运行
+    // 用于控制 PLEG 的启动和停止状态
+    isRunning bool
+
+    // runningMu 用于对 Generic PLEG 的启动/停止操作加锁
+    // 确保启动和停止操作的线程安全
+    runningMu sync.Mutex
+
+    // relistDuration 包含 relist 相关的参数
+    // 如 relist 周期、超时时间等
+    relistDuration *RelistDuration
+
+    // podCacheMutex 用于序列化 relist 调用的 updateCache 和 UpdateCache 接口
+    // 防止并发更新缓存导致的问题
+    podCacheMutex sync.Mutex
+
+    // logger 用于上下文日志记录
+    // 提供结构化的日志输出
+    logger klog.Logger
+
+    // watchConditions 跟踪 Pod 的监视条件
+    // 是一个从 Pod UID 到条件键到条件的映射
+    // 用于跟踪需要监视的特定 Pod 状态条件
+    watchConditions     map[types.UID]map[string]versionedWatchCondition
+
+    // watchConditionsLock 保护 watchConditions 的并发访问
+    // 确保对监视条件的操作是线程安全的
+    watchConditionsLock sync.Mutex
 }
+
 ```
 
-* EventedPLEG (基于事件的新实现):
+Generic PLEG 定时向 runtime 进行查询，这个过程称为 relist，这里会调用 cri 的 `ListPodSandbox` 和 `ListContainers`接口。runtime 返回所有的数据之后，PLEG 会根据 sandbox 和 container 上的数据，对应的 Pod 上，并更新到缓存中。同时，组装成事件向 PLEG Channel 发送。
+
+kubelet 会在 pod sync loop 中监听 PLEG Channel，从而针对状态变化执行相应的逻辑，来尽量保证 pod spec 和 status 的一致。
+
+<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+
+### EventedPLEG (新实现):
 
 ```go
+// EventedPLEG 是基于容器运行时事件的 PLEG 实现
+// 它通过监听容器运行时的事件流来实时获取容器状态变化
 type EventedPLEG struct {
-    runtime Runtime
-    cache Cache
-    eventChannel chan *PodLifecycleEvent 
-    runtimeService RuntimeService // CRI 服务
+    // runtime 是容器运行时接口
+    // 用于执行容器操作和获取容器信息
+    runtime kubecontainer.Runtime
+
+    // runtimeService 是运行时服务接口
+    // 提供 CRI（容器运行时接口）相关的操作
+    // 主要用于获取容器事件流
+    runtimeService internalapi.RuntimeService
+
+    // eventChannel 是事件通道
+    // 订阅者通过此通道接收 Pod 生命周期事件
+    // 当收到容器运行时事件时，会转换并发送到此通道
+    eventChannel chan *PodLifecycleEvent
+
+    // cache 用于存储同步 Pod 所需的运行时状态
+    // 缓存容器状态以提高性能，减少对运行时的直接调用
+    cache kubecontainer.Cache
+
+    // clock 用于测试目的
+    // 允许在测试中注入模拟时钟，便于时间相关的测试
+    clock clock.Clock
+
+    // genericPleg 是通用 PLEG 的实例
+    // 用作后备机制，在需要时强制执行 relist
+    // 当事件流出现问题时可以降级到这个实现
+    genericPleg podLifecycleEventGeneratorHandler
+
+    // eventedPlegMaxStreamRetries 指定从运行时获取容器事件时的最大重试次数
+    // 超过此次数后，将降级使用 genericPleg
+    eventedPlegMaxStreamRetries int
+
+    // relistDuration 包含 relist 相关的参数
+    // 如重列举周期、超时时间等
+    // 用于配置后备的 genericPleg
+    relistDuration *RelistDuration
+
+    // stopCh 是用于停止 Evented PLEG 的通道
+    // 关闭此通道将导致 PLEG 停止运行
+    stopCh chan struct{}
+
+    // stopCacheUpdateCh 用于停止缓存全局时间戳的定期更新
+    // 关闭此通道将停止缓存更新
+    stopCacheUpdateCh chan struct{}
+
+    // runningMu 用于对 Evented PLEG 的启动/停止操作加锁
+    // 确保启动和停止操作的线程安全
+    runningMu sync.Mutex
+
+    // logger 用于上下文日志记录
+    // 提供结构化的日志输出
+    logger klog.Logger
 }
 ```
 
-## 3. 工作原理
+引入 Evented PLEG 后，对 Generic PLEG 做了些许调整，主要是 relist 的周期和阈值，以及对缓存的更新策略。
 
-**GenericPLEG 工作流程:**
+* relist 的同步周期由 1s 增加到 300s。同步阈值从 3min 增加到 10min。
+* 缓存更新时，updateTime 不再是取本地的时间，而是 runtime 返回的时间。
 
-* 定期重列举(Relist):
+除此之外，Generic PLEG 会和之前一样运行，这样也保证了及时 Evented PLEG 丢失了一些 状态变更的 event，也可以由 Generic PLEG 兜底。
 
-```go
-func (g *GenericPLEG) Relist() {
-    // 1. 获取所有 Pod 列表
-    podList, err := g.runtime.GetPods(ctx, true)
-    
-    // 2. 对比状态变化
-    for pid := range g.podRecords {
-        // 生成事件
-        events := generateEvents(...)
-        
-        // 发送事件
-        g.eventChannel <- events
-    }
-    
-    // 3. 更新缓存
-    g.cache.Set(...)
-}
-```
+Evented PLEG 会调用 runtime 的 `GetContainerEvents` 来监听 runtime 中的事件，然后生成 pod 的 event，并发送到 PLEG Channel 中供 kubelet pod sync loop 消费。
 
-* 状态对比:
+如果 Evented 不能按照预期工作（比如 runtime 不支持 GetContainerEvents），还会降级到 Generic PLEG。降级逻辑是：
 
-```go
-func generateEvents(oldState, newState plegContainerState) []*PodLifecycleEvent {
-    switch newState {
-    case plegContainerRunning:
-        return ContainerStarted
-    case plegContainerExited:
-        return ContainerDied
-    }
-}
-```
+* 停止自己。
+* 停止已有的 Generic PLEG。
+* 更新 Generic PLEG 的 relist 周期和阈值为 1s, 3min。
+* 启动新的 Generic PLEG。
 
-**EventedPLEG 工作流程:**
+<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
 
-* 基于 CRI 事件流:
-
-```go
-func (e *EventedPLEG) watchEventsChannel() {
-    // 1. 订阅 CRI 事件
-    containerEventsResponseCh := make(chan *runtimeapi.ContainerEventResponse)
-    
-    // 2. 处理事件
-    for event := range containerEventsResponseCh {
-        e.processCRIEvent(event)
-    }
-}
-```
-
-* 事件处理:
-
-```go
-func (e *EventedPLEG) processCRIEvent(event *ContainerEventResponse) {
-    switch event.Type {
-    case ContainerStarted:
-        e.sendPodLifecycleEvent(ContainerStarted)
-    case ContainerStopped:
-        e.sendPodLifecycleEvent(ContainerDied)
-    }
-}
-```
-
-## 4. 主要优势
-
-* EventedPLEG 相比 GenericPLEG 的优势:
-* 实时性更好(基于事件)
-* 资源消耗更低(无需轮询)
-* 延迟更低
-* 可靠性保证:// 失败重试机制if numAttempts >= e.eventedPlegMaxStreamRetries {    // 降级到 GenericPLEG    e.Stop()    e.genericPleg.Start()}
-
-## 5. 事件类型
-
-PLEG 生成的主要事件类型:
-
-```go
-const (
-    ContainerStarted  = "ContainerStarted"
-    ContainerDied    = "ContainerDied"
-    ContainerRemoved = "ContainerRemoved"
-    ContainerChanged = "ContainerChanged"
-)
-```
-
-## 6. 缓存更新机制
-
-```go
-func (g *GenericPLEG) updateCache(pod *Pod) {
-    // 1. 获取最新状态
-    status := g.runtime.GetPodStatus()
-    
-    // 2. 保留 Pod IP
-    status.IPs = g.getPodIPs()
-    
-    // 3. 更新缓存
-    g.cache.Set(pod.ID, status)
-}
-```
-
-这种设计确保了:
-
-* 容器状态变化的可靠检测
-* 事件的及时传递
-* Pod 状态的一致性维护
