@@ -464,6 +464,57 @@ return nil, nil
 
 synchronize 是 kubelet 驱逐管理器的核心控制循环，它通过收集节点资源使用情况、检查配置的阈值是否触发、更新阈值通知器、尝试回收节点级资源（如容器镜像），当这些措施无法缓解资源压力时，会根据驱逐策略选择一个 Pod 进行驱逐，以此来保护节点的稳定运行，每次循环最多驱逐一个 Pod，整个过程是渐进式和可控的。
 
+### 计算驱逐顺序
+
+对 pod 的驱逐顺序主要取决于三个因素：
+
+* pod 的资源使用情况是否超过其 requests；
+* pod 的 priority 值；
+* pod 的内存使用情况；
+
+三个因素的判断顺序也是根据注册进 `orderedBy` 的顺序。这里 `orderedBy` 函数的多级排序也是 Kubernetes 里一个值得学习（抄作业）的一个实现，代码如下：
+
+```go
+// rankMemoryPressure orders the input pods for eviction in response to memory pressure.
+// It ranks by whether or not the pod's usage exceeds its requests, then by priority, and
+// finally by memory usage above requests.
+func rankMemoryPressure(pods []*v1.Pod, stats statsFunc) {
+    orderedBy(exceedMemoryRequests(stats), priority, memory(stats)).Sort(pods)
+}
+
+// OrderedBy returns a Sorter that sorts using the cmp functions, in order.
+// Call its Sort method to sort the data.
+func orderedBy(cmp ...cmpFunc) *multiSorter {
+	return &multiSorter{
+		cmp: cmp,
+	}
+}
+
+// exceedMemoryRequests compares whether or not pods' memory usage exceeds their requests
+func exceedMemoryRequests(stats statsFunc) cmpFunc {
+	return func(p1, p2 *v1.Pod) int {
+		p1Stats, p1Found := stats(p1)
+		p2Stats, p2Found := stats(p2)
+		if !p1Found || !p2Found {
+			// prioritize evicting the pod for which no stats were found
+			return cmpBool(!p1Found, !p2Found)
+		}
+
+		p1Memory := memoryUsage(p1Stats.Memory)
+		p2Memory := memoryUsage(p2Stats.Memory)
+		p1ExceedsRequests := p1Memory.Cmp(v1resource.GetResourceRequestQuantity(p1, v1.ResourceMemory)) == 1
+		p2ExceedsRequests := p2Memory.Cmp(v1resource.GetResourceRequestQuantity(p2, v1.ResourceMemory)) == 1
+		// prioritize evicting the pod which exceeds its requests
+		return cmpBool(p1ExceedsRequests, p2ExceedsRequests)
+	}
+}
+
+```
+
+
+
+
+
 ### Admit 阶段抢占式驱逐
 
 &#x20;kubelet 检查pod是否能在这个节点被起来 (admit) 失败时候的一次补救，驱逐优先级低的 pod 来释放资源
