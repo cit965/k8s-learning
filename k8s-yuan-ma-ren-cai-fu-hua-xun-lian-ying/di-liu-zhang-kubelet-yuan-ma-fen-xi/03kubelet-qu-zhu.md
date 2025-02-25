@@ -91,6 +91,12 @@ containers:
 
 ## Eviction （驱逐）
 
+### 代码目录
+
+pkg/kubelet/eviction/eviction\_manager.go
+
+<figure><img src="../../.gitbook/assets/1740379560457.png" alt=""><figcaption></figcaption></figure>
+
 ### 驱逐策略
 
 **软驱逐**
@@ -100,12 +106,6 @@ containers:
 **硬驱逐**
 
 硬驱逐策略没有宽限期，当达到硬驱逐条件时，kubelet会立即触发pod的驱逐，而不是优雅终止。
-
-### 代码目录
-
-pkg/kubelet/eviction/eviction\_manager.go
-
-<figure><img src="../../.gitbook/assets/1740379560457.png" alt=""><figcaption></figcaption></figure>
 
 ### Manager 接口
 
@@ -380,7 +380,7 @@ func (n *linuxCgroupNotifier) Stop() {
 
 这段代码实现了 Linux cgroup 的内存阈值通知机制：通过在 cgroup 的 event\_control 文件中配置 eventfd、watchfd 和阈值，让内核在内存使用超过阈值时通过 eventfd 发送通知；使用 epoll 机制高效地监听这个 eventfd，当收到通知时，通过 channel 通知上层的 kubelet 驱逐管理器，从而触发相应的 Pod 驱逐操作，以此来保护节点的内存资源。
 
-### synchronize
+### Synchronize
 
 还记得我们在 `managerImpl` 中看到的 `Start` 方法吗？不记得你可以回到上面再看下，在最后有一个调用 `synchronize` 的过程，这个方法会返回一个需要被驱逐的 pod。于是乎，我们需要知道在 `synchronize` 方法中是如何得到需要被驱逐的 pod 的。
 
@@ -483,6 +483,112 @@ evictionMinimumReclaim:
   memory.available: "0Mi"
   nodefs.available: "500Mi"
   imagefs.available: "2Gi"
+```
+
+### Admit 阶段抢占式驱逐
+
+&#x20;kubelet 检查pod是否能在这个节点被起来 (admit) 失败时候的一次补救，驱逐优先级低的 pod 来释放资源
+
+```go
+func (kl *Kubelet) HandlePodAdditions(pods []*v1.Pod) {
+	for _, pod := range pods {
+		
+		// Check if we can admit the pod; if not, reject it.
+		if ok, reason, message := kl.canAdmitPod(allocatedPods, pod); !ok {
+		kl.podWorkers.UpdatePod(UpdatePodOptions{
+			Pod:        pod,
+			MirrorPod:  mirrorPod,
+			UpdateType: kubetypes.SyncPodCreate,
+			StartTime:  start,
+		})
+	}
+}
+func (w *predicateAdmitHandler) Admit(attrs *PodAdmitAttributes) PodAdmitResult {
+
+    // 省略。。
+    reasons := generalFilter(podWithoutMissingExtendedResources, nodeInfo)
+    fit := len(reasons) == 0
+    if !fit {
+       reasons, err = w.admissionFailureHandler.HandleAdmissionFailure(admitPod, reasons)
+       fit = len(reasons) == 0 && err == nil
+       if err != nil {
+          message := fmt.Sprintf("Unexpected error while attempting to recover from admission failure: %v", err)
+          klog.InfoS("Failed to admit pod, unexpected error while attempting to recover from admission failure", "pod", klog.KObj(admitPod), "err", err)
+          return PodAdmitResult{
+             Admit:   fit,
+             Reason:  UnexpectedAdmissionError,
+             Message: message,
+          }
+       }
+    }
+    
+ // HandleAdmissionFailure gracefully handles admission rejection, and, in some cases,
+// to allow admission of the pod despite its previous failure.
+func (c *CriticalPodAdmissionHandler) HandleAdmissionFailure(admitPod *v1.Pod, failureReasons []lifecycle.PredicateFailureReason) ([]lifecycle.PredicateFailureReason, error) {
+	if !kubetypes.IsCriticalPod(admitPod) {
+		return failureReasons, nil
+	}
+	// InsufficientResourceError is not a reason to reject a critical pod.
+	// Instead of rejecting, we free up resources to admit it, if no other reasons for rejection exist.
+	nonResourceReasons := []lifecycle.PredicateFailureReason{}
+	resourceReasons := []*admissionRequirement{}
+	for _, reason := range failureReasons {
+		if r, ok := reason.(*lifecycle.InsufficientResourceError); ok {
+			resourceReasons = append(resourceReasons, &admissionRequirement{
+				resourceName: r.ResourceName,
+				quantity:     r.GetInsufficientAmount(),
+			})
+		} else {
+			nonResourceReasons = append(nonResourceReasons, reason)
+		}
+	}
+	if len(nonResourceReasons) > 0 {
+		// Return only reasons that are not resource related, since critical pods cannot fail admission for resource reasons.
+		return nonResourceReasons, nil
+	}
+	err := c.evictPodsToFreeRequests(admitPod, admissionRequirementList(resourceReasons))
+	// if no error is returned, preemption succeeded and the pod is safe to admit.
+	return nil, err
+}   
+
+// evictPodsToFreeRequests takes a list of insufficient resources, and attempts to free them by evicting pods
+// based on requests.  For example, if the only insufficient resource is 200Mb of memory, this function could
+// evict a pod with request=250Mb.
+func (c *CriticalPodAdmissionHandler) evictPodsToFreeRequests(admitPod *v1.Pod, insufficientResources admissionRequirementList) error {
+	podsToPreempt, err := getPodsToPreempt(admitPod, c.getPodsFunc(), insufficientResources)
+	if err != nil {
+		return fmt.Errorf("preemption: error finding a set of pods to preempt: %v", err)
+	}
+	for _, pod := range podsToPreempt {
+		// record that we are evicting the pod
+		c.recorder.Eventf(pod, v1.EventTypeWarning, events.PreemptContainer, message)
+		// this is a blocking call and should only return when the pod and its containers are killed.
+		klog.V(3).InfoS("Preempting pod to free up resources", "pod", klog.KObj(pod), "podUID", pod.UID, "insufficientResources", insufficientResources)
+		err := c.killPodFunc(pod, true, nil, func(status *v1.PodStatus) {
+			status.Phase = v1.PodFailed
+			status.Reason = events.PreemptContainer
+			status.Message = message
+			podutil.UpdatePodCondition(status, &v1.PodCondition{
+				Type:    v1.DisruptionTarget,
+				Status:  v1.ConditionTrue,
+				Reason:  v1.PodReasonTerminationByKubelet,
+				Message: "Pod was preempted by Kubelet to accommodate a critical pod.",
+			})
+		})
+		if err != nil {
+			klog.ErrorS(err, "Failed to evict pod", "pod", klog.KObj(pod))
+			// In future syncPod loops, the kubelet will retry the pod deletion steps that it was stuck on.
+			continue
+		}
+		if len(insufficientResources) > 0 {
+			metrics.Preemptions.WithLabelValues(insufficientResources[0].resourceName.String()).Inc()
+		} else {
+			metrics.Preemptions.WithLabelValues("").Inc()
+		}
+		klog.InfoS("Pod evicted successfully", "pod", klog.KObj(pod))
+	}
+	return nil
+}
 ```
 
 ## 总结
