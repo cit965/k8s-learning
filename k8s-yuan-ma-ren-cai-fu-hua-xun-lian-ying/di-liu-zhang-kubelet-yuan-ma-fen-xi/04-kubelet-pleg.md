@@ -2,9 +2,9 @@
 
 ## 基本概念
 
-Kubelet是一个节点守护程序，它可以管理节点上的 pod ，驱动 pod status 使其匹配spec 。为此，kubelet需要对（1）pod spec 和（2）container  status 做出反应。
+Kubelet是一个节点守护程序，它可以管理节点上的 pod ，驱动 pod status 使其匹配 spec 。为此，kubelet需要对 pod spec 和 container  status 做出反应。
 
-**PLEG** 全称是 **Pod Lifecycle Event Generator**，PLEG 的主要职责是定期检查节点上所有 Pod 的状态，并与上一次检查的结果进行比较，从而检测出 Pod 状态的变化（如容器启动、停止、崩溃等）。这些状态变化会被封装成事件，供 Kubelet 的其他模块（如同步循环）使用。
+**PLEG** 全称是 **Pod Lifecycle Event Generator**，PLEG 的主要职责是定期检查节点上所有 Pod 的状态，并与上一次检查的结果进行比较，从而检测出 Pod 状态的变化（如容器启动、停止、崩溃等）。这些状态变化会被封装成事件，供 Kubelet 的其他模块（如同步循环）使用。这样可以提高 kubelet 性能和可拓展性。
 
 ## 前世今生
 
