@@ -522,6 +522,11 @@ func (w *predicateAdmitHandler) Admit(attrs *PodAdmitAttributes) PodAdmitResult 
        }
     }
     
+ // 这是一个专门处理关键 Pod（Critical Pod）准入失败的处理器。当关键 Pod 因为资源不足而无法被调度时，它会通过驱逐其他 Pod 来确保关键 Pod 能够运行。  
+ // 只处理因资源不足导致的准入失败 ,驱逐策略遵循 QoS 等级顺序：
+ // BestEffort（尽力而为型）优先驱逐
+ // Burstable（可突发型）其次
+// Guaranteed（有保证型）最后考虑
  // HandleAdmissionFailure gracefully handles admission rejection, and, in some cases,
 // to allow admission of the pod despite its previous failure.
 func (c *CriticalPodAdmissionHandler) HandleAdmissionFailure(admitPod *v1.Pod, failureReasons []lifecycle.PredicateFailureReason) ([]lifecycle.PredicateFailureReason, error) {
