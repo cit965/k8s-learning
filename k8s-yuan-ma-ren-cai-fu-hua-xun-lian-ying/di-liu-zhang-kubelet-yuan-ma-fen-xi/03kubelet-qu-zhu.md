@@ -603,6 +603,6 @@ func (c *CriticalPodAdmissionHandler) evictPodsToFreeRequests(admitPod *v1.Pod, 
 2. pod 何时会被驱逐？
    * Qos内核自动 OOM killer
    * 节点压力驱逐
-   * Admit 失败后重试时抢占式驱逐
+   * 当关键 Pod 因为资源不足而无法被调度时，它会通过驱逐其他 Pod 来确保关键 Pod 能够运行。
 3. pod 驱逐的策略是什么？
    * 每次先驱逐最不满足要求且消耗最大的那**一个**，并不会一次把不满足要求的都驱逐，因为可能驱逐一个之后，后面的使用资源是可以满足余下的 pod 的。
