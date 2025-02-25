@@ -490,6 +490,8 @@ evictionMinimumReclaim:
 1. pod 的资源限制条件何时会被检查？
    * 有两种，cgroup 会触发监听内存，一旦资源超过限制就会有事件，从而触发 hander 也就是 `synchronize` 立刻检查；还有一种就是定时执行 `synchronize` 间隔是 `monitoringInterval` 默认是 10s
 2. pod 何时会被驱逐？
-   * 当检查出现问题立刻驱逐，所以何时和检查间隔有关。
+   * Qos内核自动 OOM killer
+   * 节点压力驱逐
+   * Admit 失败后重试时抢占式驱逐
 3. pod 驱逐的策略是什么？
    * 每次先驱逐最不满足要求且消耗最大的那**一个**，并不会一次把不满足要求的都驱逐，因为可能驱逐一个之后，后面的使用资源是可以满足余下的 pod 的。
