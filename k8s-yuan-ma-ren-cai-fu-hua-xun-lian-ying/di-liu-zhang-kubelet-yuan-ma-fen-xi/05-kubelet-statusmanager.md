@@ -172,94 +172,142 @@ func (m *manager) syncBatch(all bool) int {
 ## SyncPod
 
 ```go
-// syncBatch 将 Pod 状态与 apiserver 同步
-// 参数 all: 是否执行全量同步
-// 返回值: 尝试同步的数量（用于测试）
-func (m *manager) syncBatch(all bool) int {
-    // podSync 定义了需要同步的 Pod 信息
-    type podSync struct {
-        podUID    types.UID               // Pod 的 UID
-        statusUID kubetypes.MirrorPodUID  // 状态对应的 UID（对于静态 Pod 是 Mirror Pod 的 UID）
-        status    versionedPodStatus      // 带版本的 Pod 状态
-    }
-
-    // 存储需要更新的状态列表
-    var updatedStatuses []podSync
+// syncPod 将给定的状态与 API 服务器同步
+// 参数：
+//   - uid: Pod 的 UID
+//   - status: 带版本的 Pod 状态
+// 注意：调用者不能持有状态锁
+func (m *manager) syncPod(uid types.UID, status versionedPodStatus) {
+    // 1. 从 API 服务器获取最新的 Pod 信息
+    pod, err := m.kubeClient.CoreV1().Pods(status.podNamespace).Get(
+        context.TODO(), 
+        status.podName, 
+        metav1.GetOptions{},
+    )
     
-    // 获取 Pod UID 的转换映射
-    // podToMirror: 普通Pod/静态Pod UID -> Mirror Pod UID
-    // mirrorToPod: Mirror Pod UID -> 静态Pod UID
-    podToMirror, mirrorToPod := m.podManager.GetUIDTranslations()
-
-    // 关键部分：使用读锁保护并发访问
-    func() {
-        m.podStatusesLock.RLock()
-        defer m.podStatusesLock.RUnlock()
-
-        // 清理孤立的版本记录
-        // 仅在全量同步时执行
-        if all {
-            for uid := range m.apiStatusVersions {
-                // 检查 Pod 和 Mirror Pod 是否都不存在
-                _, hasPod := m.podStatuses[types.UID(uid)]
-                _, hasMirror := mirrorToPod[uid]
-                if !hasPod && !hasMirror {
-                    // 删除不再需要的版本记录
-                    delete(m.apiStatusVersions, uid)
-                }
-            }
-        }
-
-        // 遍历所有 Pod 状态，决定哪些需要更新
-        for uid, status := range m.podStatuses {
-            // 获取用于 API 服务器的状态 UID
-            // 对于静态 Pod，需要使用其 Mirror Pod 的 UID
-            uidOfStatus := kubetypes.MirrorPodUID(uid)
-            
-            // 处理静态 Pod 的特殊情况
-            if mirrorUID, ok := podToMirror[kubetypes.ResolvedPodUID(uid)]; ok {
-                // 如果静态 Pod 没有对应的 Mirror Pod，跳过处理
-                if mirrorUID == "" {
-                    klog.V(5).InfoS("Static pod does not have a corresponding mirror pod; skipping",
-                        "podUID", uid,
-                        "pod", klog.KRef(status.podNamespace, status.podName))
-                    continue
-                }
-                uidOfStatus = mirrorUID
-            }
-
-            // 增量更新模式
-            if !all {
-                // 只有新版本的状态才需要更新
-                if m.apiStatusVersions[uidOfStatus] >= status.version {
-                    continue
-                }
-                updatedStatuses = append(updatedStatuses, podSync{uid, uidOfStatus, status})
-                continue
-            }
-
-            // 全量更新模式：检查是否需要更新或重新同步
-            // 1. 检查是否需要更新（版本不匹配或其他原因）
-            if m.needsUpdate(types.UID(uidOfStatus), status) {
-                updatedStatuses = append(updatedStatuses, podSync{uid, uidOfStatus, status})
-            } else if m.needsReconcile(uid, status.status) {
-                // 2. 检查是否需要重新同步（状态不一致）
-                // 删除版本记录强制更新
-                delete(m.apiStatusVersions, uidOfStatus)
-                updatedStatuses = append(updatedStatuses, podSync{uid, uidOfStatus, status})
-            }
-        }
-    }()
-
-    // 执行实际的状态同步
-    for _, update := range updatedStatuses {
-        klog.V(5).InfoS("Sync pod status", 
-            "podUID", update.podUID, 
-            "statusUID", update.statusUID, 
-            "version", update.status.version)
-        m.syncPod(update.podUID, update.status)
+    // 处理 Pod 不存在的情况
+    if errors.IsNotFound(err) {
+        klog.V(3).InfoS("Pod does not exist on the server",
+            "podUID", uid,
+            "pod", klog.KRef(status.podNamespace, status.podName))
+        // Pod 已被删除，状态将在 RemoveOrphanedStatuses 中清理
+        // 这里直接忽略更新
+        return
+    }
+    
+    // 处理其他错误
+    if err != nil {
+        klog.InfoS("Failed to get status for pod",
+            "podUID", uid,
+            "pod", klog.KRef(status.podNamespace, status.podName),
+            "err", err)
+        return
     }
 
-    return len(updatedStatuses)
+    // 2. 处理 Pod 重建场景
+    // 获取转换后的 Pod UID（处理静态 Pod 的情况）
+    translatedUID := m.podManager.TranslatePodUID(pod.UID)
+    // 如果 Pod 被删除后重建，UID 会改变，此时需要跳过状态更新
+    if len(translatedUID) > 0 && translatedUID != kubetypes.ResolvedPodUID(uid) {
+        klog.V(2).InfoS("Pod was deleted and then recreated, skipping status update",
+            "pod", klog.KObj(pod),
+            "oldPodUID", uid,
+            "podUID", translatedUID)
+        // 删除旧的状态记录
+        m.deletePodStatus(uid)
+        return
+    }
+
+    // 3. 合并 Pod 状态
+    // 将本地状态与 API 服务器状态合并，考虑容器运行状态
+    mergedStatus := mergePodStatus(
+        pod.Status, 
+        status.status,
+        m.podDeletionSafety.PodCouldHaveRunningContainers(pod),
+    )
+
+    // 4. 更新 API 服务器中的状态
+    // 使用 patch 操作更新状态，避免覆盖其他字段
+    newPod, patchBytes, unchanged, err := statusutil.PatchPodStatus(
+        context.TODO(),
+        m.kubeClient,
+        pod.Namespace,
+        pod.Name,
+        pod.UID,
+        pod.Status,
+        mergedStatus,
+    )
+    klog.V(3).InfoS("Patch status for pod", 
+        "pod", klog.KObj(pod), 
+        "podUID", uid, 
+        "patch", string(patchBytes))
+
+    // 处理更新错误
+    if err != nil {
+        klog.InfoS("Failed to update status for pod", 
+            "pod", klog.KObj(pod), 
+            "err", err)
+        return
+    }
+
+    // 5. 处理更新结果
+    if unchanged {
+        // 状态未发生变化
+        klog.V(3).InfoS("Status for pod is up-to-date", 
+            "pod", klog.KObj(pod), 
+            "statusVersion", status.version)
+    } else {
+        // 状态已更新
+        klog.V(3).InfoS("Status for pod updated successfully", 
+            "pod", klog.KObj(pod), 
+            "statusVersion", status.version, 
+            "status", mergedStatus)
+        pod = newPod
+        // 记录启动延迟相关指标
+        m.podStartupLatencyHelper.RecordStatusUpdated(pod)
+    }
+
+    // 6. 记录状态更新耗时
+    if status.at.IsZero() {
+        klog.V(3).InfoS("Pod had no status time set", 
+            "pod", klog.KObj(pod), 
+            "podUID", uid, 
+            "version", status.version)
+    } else {
+        duration := time.Since(status.at).Truncate(time.Millisecond)
+        metrics.PodStatusSyncDuration.Observe(duration.Seconds())
+    }
+
+    // 7. 更新本地版本记录
+    m.apiStatusVersions[kubetypes.MirrorPodUID(pod.UID)] = status.version
+
+    // 8. 处理 Pod 删除
+    // 注意：不处理 Mirror Pod 的优雅删除
+    if m.canBeDeleted(pod, status.status, status.podIsFinished) {
+        // 设置删除选项，立即删除
+        deleteOptions := metav1.DeleteOptions{
+            GracePeriodSeconds: new(int64),
+            // 使用 Pod UID 作为删除前提条件，防止删除同名的新 Pod
+            Preconditions: metav1.NewUIDPreconditions(string(pod.UID)),
+        }
+        
+        // 从 API 服务器删除 Pod
+        err = m.kubeClient.CoreV1().Pods(pod.Namespace).Delete(
+            context.TODO(), 
+            pod.Name, 
+            deleteOptions,
+        )
+        if err != nil {
+            klog.InfoS("Failed to delete status for pod", 
+                "pod", klog.KObj(pod), 
+                "err", err)
+            return
+        }
+        
+        klog.V(3).InfoS("Pod fully terminated and removed from etcd", 
+            "pod", klog.KObj(pod))
+        // 清理本地状态
+        m.deletePodStatus(uid)
+    }
 }
 ```
