@@ -62,7 +62,7 @@
   * [5.15 序列化器与序列化工厂3](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.15-xu-lie-hua-qi-yu-xu-lie-hua-gong-chang-3.md)
   * [5.16 apimachinery在 client-go中的使用](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-wu-zhang-apimachinery/5.16-apimachinery-zai-clientgo-zhong-de-shi-yong.md)
 * [第六章： kubelet 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/README.md)
-  * [04-pleg](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/04-pleg.md)
+  * [04-kubelet pleg](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/04-kubelet-pleg.md)
   * [01-kubelet 创建pod 流程](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/01kubelet-chuang-jian-pod-liu-cheng.md)
   * [02-kubelet 探针](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/02kubelet-tan-zhen.md)
   * [03-kubelet 驱逐](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/03kubelet-qu-zhu.md)

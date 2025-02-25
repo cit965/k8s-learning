@@ -1,4 +1,6 @@
-# 04-pleg
+# 04-kubelet pleg
+
+<figure><img src="../../.gitbook/assets/image (79).png" alt=""><figcaption></figcaption></figure>
 
 ## 1. PLEG 的基本概念
 
