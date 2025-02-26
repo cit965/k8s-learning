@@ -189,7 +189,7 @@ func (m *manager) syncBatch(all bool) int {
 
 2、检查 pod `oldStatus` 与 `currentStatus` 的 uid 是否相等，若不相等则说明 pod 被重建过；
 
-3、调用 mergePodStatus 合并旧的和新的 Pod 状态 ,保留非 kubelet 管理的 Pod 条件, 确保只有在所有容器都终止后才进行终止状态转换
+3、调用 `statusutil.PatchPodStatus` 同步 pod 最新的 status 至 apiserver，并将返回的 pod 作为 newPod；
 
 4、检查 newPod 是否处于 terminated 状态，若处于 terminated 状态则调用 apiserver 接口进行删除并从 cache 中清除，删除后 pod 会进行重建；
 
@@ -333,3 +333,9 @@ func (m *manager) syncPod(uid types.UID, status versionedPodStatus) {
     }
 }
 ```
+
+## State
+
+status 目录下还有个 state 文件夹，这个文件夹下的代码是为了支持 InPlacePodVerticalScaling 功能，支持 Pod 的动态资源调整和确保 Kubelet 重启后的状态恢复。
+
+<figure><img src="../../.gitbook/assets/image (83).png" alt=""><figcaption></figcaption></figure>
