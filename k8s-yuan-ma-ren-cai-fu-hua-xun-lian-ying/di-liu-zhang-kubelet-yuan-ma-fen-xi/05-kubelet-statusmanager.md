@@ -25,9 +25,9 @@ func (kl *Kubelet) Run(updates <-chan kubetypes.PodUpdate) {
 }
 
 func (m *manager) Start() {
+	// 如果开启了 InPlacePodVerticalScaling 功能门禁，就需要给 state 字段赋值，以便记录资源分配状态
 	// Initialize m.state to no-op state checkpoint manager
 	m.state = state.NewNoopStateCheckpoint()
-
 	// Create pod allocation checkpoint manager even if client is nil so as to allow local get/set of AllocatedResources & Resize
 	if utilfeature.DefaultFeatureGate.Enabled(features.InPlacePodVerticalScaling) {
 		stateImpl, err := state.NewStateCheckpoint(m.stateFileDirectory, podStatusManagerStateFile)
@@ -75,6 +75,18 @@ func (m *manager) Start() {
 ```
 
 ## SyncBatch
+
+`syncBatch` 是定期将 statusManager 缓存 podStatuses 中的数据同步到 apiserver 的方法，主要逻辑为：
+
+1、调用 `m.podManager.GetUIDTranslations` 从 podManager 中获取 mirrorPod uid 与 staticPod uid 的对应关系；
+
+2、从  apiStatusVersions 中清理已经不存在的 pod，遍历 apiStatusVersions，检查 podStatuses 以及 mirrorToPod 中是否存在该对应的 pod，若不存在则从 apiStatusVersions 中删除；
+
+3、遍历 podStatuses，首先调用 `needsUpdate` 检查 pod 的状态是否与 apiStatusVersions 中的一致，然后调用 `needsReconcile` 检查 pod 的状态是否与 podManager 中的一致，若不一致则将需要同步的 pod 加入到 updatedStatuses 列表中；
+
+4、遍历 updatedStatuses 列表，调用 `m.syncPod` 方法同步状态；
+
+syncBatch 主要是将 statusManage cache 中的数据与 apiStatusVersions 和 podManager 中的数据进行对比是否一致，若不一致则以 statusManage cache 中的数据为准同步至 apiserver。
 
 ```go
 // syncBatch 将 Pod 状态与 apiserver 同步
@@ -170,6 +182,16 @@ func (m *manager) syncBatch(all bool) int {
 ```
 
 ## SyncPod
+
+`syncPod` 是用来同步 pod 最新状态至 apiserver 的方法，主要逻辑为：
+
+1、从 apiserver 获取 pod 的 oldStatus；
+
+2、检查 pod `oldStatus` 与 `currentStatus` 的 uid 是否相等，若不相等则说明 pod 被重建过；
+
+3、调用 mergePodStatus 合并旧的和新的 Pod 状态 ,保留非 kubelet 管理的 Pod 条件, 确保只有在所有容器都终止后才进行终止状态转换
+
+4、检查 newPod 是否处于 terminated 状态，若处于 terminated 状态则调用 apiserver 接口进行删除并从 cache 中清除，删除后 pod 会进行重建；
 
 ```go
 // syncPod 将给定的状态与 API 服务器同步
