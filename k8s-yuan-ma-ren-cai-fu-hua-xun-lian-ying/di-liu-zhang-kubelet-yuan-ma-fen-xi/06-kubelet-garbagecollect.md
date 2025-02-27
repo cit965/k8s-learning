@@ -160,7 +160,7 @@ func (cgc *containerGC) GarbageCollect(
     // 收集所有错误
     errors := []error{}
 
-    // 1. 清理可回收的容器
+    // 1. 清理可回收的容器(不在 running 并且创建时间大于 MinAge 的容器)
     if err := cgc.evictContainers(
         ctx, 
         gcPolicy, 
