@@ -67,6 +67,7 @@
   * [03-kubelet 驱逐](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/03kubelet-qu-zhu.md)
   * [04-kubelet pleg](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/04-kubelet-pleg.md)
   * [05-kubelet statusManager](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/05-kubelet-statusmanager.md)
+  * [06-kubelet garbageCollect](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-liu-zhang-kubelet-yuan-ma-fen-xi/06-kubelet-garbagecollect.md)
 * [第七章： kubeproxy 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-qi-zhang-kubeproxy-yuan-ma-fen-xi.md)
 * [第八章： kubectl 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-ba-zhang-kubectl-yuan-ma-fen-xi.md)
 * [第九章： cloud-controller-manager 源码分析](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/di-jiu-zhang-cloudcontrollermanager-yuan-ma-fen-xi.md)
