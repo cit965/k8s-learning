@@ -201,7 +201,9 @@ func (c *controller) Run(ctx context.Context) {
 
 ### nodelifecycle&#x20;
 
-我们再看看 kube-controler-mgr 中的 nodelifecycyle 控制器做的事：
+我们再看看 kube-controler-mgr 中的 nodelifecycyle 控制器是如何处理租约的。
+
+如果租约过期，说明 kubelet 所在的节点因为某些原因无法上报，控制器将节点状态设置为 Unknow，并驱逐该节点上的 pod。
 
 ```go
 // pkg/controller/nodelifecycle/node_lifecycle_controller.go:830
