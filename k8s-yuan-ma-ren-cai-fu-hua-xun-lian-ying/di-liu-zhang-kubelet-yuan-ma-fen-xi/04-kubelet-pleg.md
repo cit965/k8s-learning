@@ -62,7 +62,7 @@ Kubelet是一个节点守护程序，它可以管理节点上的 pod ，驱动 p
 
 
 
-<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 ## 事件类型
 
