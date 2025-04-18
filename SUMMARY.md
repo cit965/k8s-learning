@@ -79,6 +79,7 @@
     * [1601-k8s.io/client-go 中的 context 支持](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/1601k8s.ioclientgo-zhong-de-context-zhi-chi.md)
     * [5.3 api-conventions（翻译）](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/5.2-api-conventions.md)
     * [KEP-3157 allow informers for getting a stream of data instead of chunking.](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/kep-3157-allow-informers-for-getting-a-stream-of-data-instead-of-chunking..md)
+  * [k8s 1.33 版本预览](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/k8s-1.33-ban-ben-yu-lan.md)
 
 ## 平台工程训练营一期
 
