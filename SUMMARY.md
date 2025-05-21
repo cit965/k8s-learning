@@ -81,7 +81,7 @@
     * [KEP-3157 allow informers for getting a stream of data instead of chunking.](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/sig-api-machinery/kep-3157-allow-informers-for-getting-a-stream-of-data-instead-of-chunking..md)
   * [k8s 1.33 版本预览](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/k8s-1.33-ban-ben-yu-lan.md)
   * [k8s 1.33 发布](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/k8s-1.33-fa-bu.md)
-  * [k8s 早期那些事-01-json](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/k8s-zao-qi-na-xie-shi-01json.md)
+  * [Kubernetes源码探秘：从早期设计看容器编排的演进](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/kubernetes-yuan-ma-tan-mi-cong-zao-qi-she-ji-kan-rong-qi-bian-pai-de-yan-jin.md)
 
 ## 平台工程训练营一期
 
