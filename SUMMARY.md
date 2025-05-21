@@ -82,6 +82,7 @@
   * [k8s 1.33 版本预览](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/k8s-1.33-ban-ben-yu-lan.md)
   * [k8s 1.33 发布](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/k8s-1.33-fa-bu.md)
   * [Kubernetes源码探秘：从早期设计看容器编排的演进](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/kubernetes-yuan-ma-tan-mi-cong-zao-qi-she-ji-kan-rong-qi-bian-pai-de-yan-jin.md)
+  * [2025-0521-Add a list of modules that should be pinned at current versions #131871](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/kep/2025-0521-add-a-list-of-modules-that-should-be-pinned-at-current-versions-131871.md)
 
 ## 平台工程训练营一期
 
