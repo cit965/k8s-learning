@@ -124,11 +124,3 @@
 * [软件推广](ruan-jian-tui-guang/README.md)
   * [01-运行在 docker 中的 windows](ruan-jian-tui-guang/01-yun-xing-zai-docker-zhong-de-windows.md)
   * [02-AI 写代码写文章](ruan-jian-tui-guang/02ai-xie-dai-ma-xie-wen-zhang.md)
-
-## 变现
-
-* [01-2025年技术人如何变现](bian-xian/012025-nian-ji-shu-ren-ru-he-bian-xian.md)
-
-## AI 讲 k8s 源码
-
-* [k8s 之父教你使用 AI 二次开发 k8s](ai-jiang-k8s-yuan-ma/k8s-zhi-fu-jiao-ni-shi-yong-ai-er-ci-kai-fa-k8s.md)
