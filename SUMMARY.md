@@ -25,6 +25,7 @@
   * [03-Schedule 源码讲解](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/03schedule-yuan-ma-jiang-jie.md)
   * [04-Scheduler 二次开发](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/04scheduler-er-ci-kai-fa.md)
   * [05-nodeSelector,nodeAffinity](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/ren-zheng-shou-quan/schedule/05-nodeselector-nodeaffinity.md)
+  * [06-调度器队列](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/schedule/06-diao-du-qi-dui-lie.md)
 * [第三章： operator开发](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/README.md)
   * [02-operator 二次开发背景](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/02operator-er-ci-kai-fa-bei-jing.md)
   * [01-controller-runtime](k8s-yuan-ma-ren-cai-fu-hua-xun-lian-ying/operator/01-controller-runtime.md)
