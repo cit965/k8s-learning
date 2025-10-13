@@ -8,7 +8,7 @@
 
 当前容器产品在企业中的使用已经非常普遍，对于运维和开发团队而言，熟练掌握容器技术的使用也成为一门必不可少的技能。
 
-<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1) (1).png" alt="" width="563"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1) (1) (1).png" alt="" width="563"><figcaption></figcaption></figure>
 
 ## Docker desktop
 
@@ -46,7 +46,7 @@ docker build -t welcome-to-docker .
 
 **-t** 标志为你的镜像指定一个名称（在这个例子中是 **welcome-to-docker**）。而 **.** 让 Docker 知道它可以在哪里找到 Dockerfile。构建完成后，镜像将出现在 **镜像** 标签中。选择镜像名称以查看其详细信息。选择 **运行** 以将其作为容器运行。在 **可选设置** 中记得指定一个端口号（比如 **8080**）。
 
-<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1).png" alt="" width="563"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1).png" alt="" width="563"><figcaption></figcaption></figure>
 
 你也可以通过命令来启动一个容器：
 
@@ -58,7 +58,7 @@ docker run -d -p 8080:80 docker/welcome-to-docker
 
 您可以通过转到 Docker 桌面仪表板的**容器**视图来查看所有容器。
 
-<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 该容器运行一个显示简单网站的 Web 服务器。当处理更复杂的项目时，您将在不同的容器中运行不同的部分。例如，您可以为前端、后端和数据库运行不同的容器。
 

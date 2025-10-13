@@ -13,7 +13,7 @@ k8s是一个管理容器的系统，而kubelet是每个工作节点（Node）上
 
 下图是 kubelet 上报状态的一个示意图。
 
-<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 从图中，我们可以看到 kubelet 有两条路径上报 node 的状态：
 

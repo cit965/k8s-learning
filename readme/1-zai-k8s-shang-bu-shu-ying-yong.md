@@ -14,7 +14,7 @@ Kubernetes 是一个用于部署容器的平台。所有部署到 Kubernetes 的
 
 这就引出了容器。容器是一种只打包你的应用程序及其所需的依赖，然后在一个隔离的环境中运行的方式，就像虚拟机一样，但不需要安装和管理操作系统。
 
-<figure><img src="../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ## 1.2 容器的好处
 
