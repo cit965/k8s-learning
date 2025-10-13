@@ -6,7 +6,7 @@
 
 
 
-* 观看[新的贡献者培训](https://youtu.be/BsQB0JbMXmI?si=ON2P2LIiYa8Rw6HS)
+* 观看[新贡献者培训](https://youtu.be/BsQB0JbMXmI?si=ON2P2LIiYa8Rw6HS)
 * 参加 [SIG 会议](https://k8s.dev/calendar)
 * 加入[邮件列表](https://groups.google.com/a/kubernetes.io/g/dev)
 * 寻找门槛低的机会，例如[影子计划](https://groups.google.com/a/kubernetes.io/g/dev/c/ei-svAeA8Rg/m/B5rp8vmJAAAJ)和[导师团队](https://groups.google.com/a/kubernetes.io/g/dev/c/JbdZJVjmkwQ/m/4VW6bmhNAAAJ)
