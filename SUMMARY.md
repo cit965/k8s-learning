@@ -86,7 +86,7 @@
   * [2025-0521-Add a list of modules that should be pinned at current versions #131871](k8s-yuan-ma-jie-xi/kep/2025-0521-add-a-list-of-modules-that-should-be-pinned-at-current-versions-131871.md)
   * [2025 年如何为 Kubernetes 做出贡献](k8s-yuan-ma-jie-xi/kep/2025-nian-ru-he-wei-kubernetes-zuo-chu-gong-xian.md)
   * [Kubernetes 调度三剑客：污点、容忍度和节点选择器实战指南](k8s-yuan-ma-jie-xi/kep/kubernetes-diao-du-san-jian-ke-wu-dian-rong-ren-du-he-jie-dian-xuan-ze-qi-shi-zhan-zhi-nan.md)
-* Group 1
+* [Group 1](k8s-yuan-ma-jie-xi/group-1/README.md)
   * [Page 1](k8s-yuan-ma-jie-xi/group-1/page-1.md)
 
 ## 平台工程
